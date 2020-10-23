@@ -1,0 +1,25 @@
+ version: "3.7"
+
+ volumes:
+   beta-var:
+
+ services:
+
+   splinterd-beta:
+     image: splintercommunity/splinterd:latest
+     container_name: splinterd-beta
+     hostname: beta
+     volumes:
+       - beta-var:/var/lib/splinter
+       - ./config:/config
+     entrypoint: |
+       bash -c "
+         splinter cert generate --skip && \
+         splinterd -v \
+             --node-id beta \
+             --network-endpoints tcps://0.0.0.0:8044 \
+             --advertised-endpoints tcps://splinterd-beta:8044 \
+             --rest-api-endpoint 0.0.0.0:8085 \
+             --registries file:///config/beta-registry.yaml \
+             --tls-insecure
+       "
