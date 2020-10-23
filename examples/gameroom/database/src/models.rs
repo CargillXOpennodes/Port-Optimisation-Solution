@@ -162,28 +162,33 @@ pub struct NewGameroomNotification {
 }
 
 #[derive(Clone, Queryable, Identifiable, Associations, Insertable, AsChangeset)]
-#[table_name = "xo_games"]
-pub struct XoGame {
+#[table_name = "messages"]
+pub struct Message {
     pub id: i64,
     pub circuit_id: String,
-    pub game_name: String,
-    pub player_1: String,
-    pub player_2: String,
-    pub game_status: String,
-    pub game_board: String,
+    pub message_name: String,
+    pub message_content: String,
+    pub message_type: String,
+    pub previous_id: Option<i64>,
+    pub sender: String,
+    pub participant_1: String,
+    pub participant_2: String,
     pub created_time: SystemTime,
     pub updated_time: SystemTime,
 }
 
 #[derive(Debug, Insertable)]
-#[table_name = "xo_games"]
-pub struct NewXoGame {
+#[table_name = "messages"]
+pub struct NewMessage {
+    pub id: i64,
     pub circuit_id: String,
-    pub game_name: String,
-    pub player_1: String,
-    pub player_2: String,
-    pub game_status: String,
-    pub game_board: String,
+    pub message_name: String,
+    pub message_content: String,
+    pub message_type: String,
+    pub previous_id: Option<i64>,
+    pub sender: String,
+    pub participant_1: String,
+    pub participant_2: String,
     pub created_time: SystemTime,
     pub updated_time: SystemTime,
 }

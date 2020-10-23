@@ -95,14 +95,16 @@ table! {
 }
 
 table! {
-    xo_games (id) {
+    message (id) {
         id -> Int8,
         circuit_id -> Text,
-        game_name -> Text,
-        player_1 -> Text,
-        player_2 -> Text,
-        game_status -> Text,
-        game_board -> Text,
+        message_name -> Text,
+        message_content -> Text,
+        message_type -> Text,
+        previous_id -> Int8,
+        sender -> Text,
+        participant_1 -> Text,
+        participant_2 -> Text,
         created_time -> Timestamp,
         updated_time -> Timestamp,
     }
