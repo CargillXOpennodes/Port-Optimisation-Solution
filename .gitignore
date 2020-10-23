@@ -43,6 +43,9 @@
 /examples/gameroom/daemon/target
 /examples/gameroom/daemon/Cargo.lock
 
+/examples/gameroom/smart-contract/target
+/examples/gameroom/smart-contract/Cargo.lock
+
 /examples/gameroom/gameroom-app/src/compiled_protos.json
 
 /services/scabbard/cli/packaging/man/*.1
@@ -56,4 +59,4 @@
 # editor
 **/.vscode
 
-/examples/gameroom/smart-contract/target
+
