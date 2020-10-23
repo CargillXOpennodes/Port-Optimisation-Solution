@@ -1,3 +1,12 @@
+   - identity: delta
+     endpoints:
+       - tcps://splinterd-delta:8044
+     display_name: delta
+     keys:
+       - 03c2e4e31077cc84f8af336630014e530ba5ce74eb867824777e6729ad3c7c92e5
+     metadata:
+       organization: delta
+
    - identity: beta
      endpoints:
        - tcps://splinterd-beta:8044
@@ -15,13 +24,4 @@
        - 02df776e65a3e6d50df51985b3de5d36e7d05d5beb9fa613186d93556cba77770e
      metadata:
        organization: alpha
-
-   - identity: delta
-     endpoints:
-       - tcps://splinterd-delta:8044
-     display_name: delta
-     keys:
-       - 03c2e4e31077cc84f8af336630014e530ba5ce74eb867824777e6729ad3c7c92e5
-     metadata:
-       organization: delta
 
