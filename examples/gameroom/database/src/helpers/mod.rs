@@ -14,7 +14,7 @@
 
 mod gameroom;
 mod notification;
-mod xo_games;
+mod message;
 
 pub use gameroom::{
     fetch_active_gamerooms, fetch_gameroom, fetch_gameroom_by_alias,

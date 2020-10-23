@@ -20,6 +20,7 @@ mod notification;
 mod proposal;
 mod submit;
 mod xo_games;
+mod message;
 
 pub use authenticate::*;
 pub use gameroom::*;
