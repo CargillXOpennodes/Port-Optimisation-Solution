@@ -20,15 +20,16 @@ use std::{error::Error, fmt, time::SystemTime};
 use diesel::connection::Connection;
 use gameroom_database::{
     error, helpers,
-    models::{NewXoGame, XoGame},
+    models::{NewMessage, Message},
     ConnectionPool,
 };
 use scabbard::service::{StateChange, StateChangeEvent};
 
-use crate::authorization_handler::sabre::{get_xo_contract_address, XO_PREFIX};
+use crate::authorization_handler::sabre::{get_message_contract_address, MESSAGE_PREFIX};
 use crate::authorization_handler::AppAuthHandlerError;
+use gameroom_database::schema::message::dsl::message;
 
-pub struct XoStateDeltaProcessor {
+pub struct MessageStateDeltaProcessor {
     circuit_id: String,
     node_id: String,
     requester: String,
@@ -36,18 +37,18 @@ pub struct XoStateDeltaProcessor {
     db_pool: ConnectionPool,
 }
 
-impl XoStateDeltaProcessor {
+impl MessageStateDeltaProcessor {
     pub fn new(
         circuit_id: &str,
         node_id: &str,
         requester: &str,
         db_pool: &ConnectionPool,
     ) -> Result<Self, AppAuthHandlerError> {
-        Ok(XoStateDeltaProcessor {
+        Ok(MessageDeltaProcessor {
             circuit_id: circuit_id.into(),
             node_id: node_id.to_string(),
             requester: requester.to_string(),
-            contract_address: get_xo_contract_address()?,
+            contract_address: get_message_contract_address()?,
             db_pool: db_pool.clone(),
         })
     }
@@ -80,7 +81,7 @@ impl XoStateDeltaProcessor {
         debug!("Received state change: {}", change);
         match change {
             StateChange::Set { key, .. } if key == &self.contract_address => {
-                debug!("Xo contract created successfully");
+                debug!("Message contract created successfully");
                 let time = SystemTime::now();
                 let conn = &*self.db_pool.get()?;
                 conn.transaction::<_, error::DatabaseError, _>(|| {
@@ -111,27 +112,33 @@ impl XoStateDeltaProcessor {
                 })
                 .map_err(StateDeltaError::from)
             }
-            StateChange::Set { key, value } if &key[..6] == XO_PREFIX => {
+            StateChange::Set { key, value } if &key[..6] == MESSAGE_PREFIX => {
                 let time = SystemTime::now();
                 let game_state: Vec<String> = String::from_utf8(value.to_vec())
-                    .map_err(|err| StateDeltaError::XoPayloadParseError(format!("{:?}", err)))
+                    .map_err(|err| StateDeltaError::MessagePayloadParseError(format!("{:?}", err)))
                     .map(|s| s.split(',').map(String::from).collect())?;
 
                 let conn = &*self.db_pool.get()?;
                 conn.transaction::<_, error::DatabaseError, _>(|| {
-                    if let Some(game) =
-                        helpers::fetch_xo_game(&conn, &self.circuit_id, &game_state[0])?
+                    if let Some(message_1) =
+                        helpers::fetch_message(&conn, &self.circuit_id, &game_state[0])
                     {
-                        helpers::update_xo_game(
-                            &conn,
-                            XoGame {
-                                game_board: game_state[1].clone(),
-                                game_status: game_state[2].clone(),
-                                player_1: game_state[3].clone(),
-                                player_2: game_state[4].clone(),
-                                updated_time: time,
-                                ..game
-                            },
+                        let mut m = Message {
+                            message_name: items[0].to_string(),
+                            message_content: items[1].to_string(),
+                            message_type: MessageType::TEXT,
+                            id: items[3].parse::<u32>().unwrap(),
+                            previous_id: None,
+                            sender: items[5].to_string(),
+                            ..message_1
+                        };
+
+                        if let Some(n) = items[4].to_string().parse::<i64>() {
+                            m.previous_id = Some(n);
+                        }
+
+                        helpers::add_message(
+                            &conn,m
                         )?;
 
                         let notification = helpers::create_new_notification(
@@ -141,18 +148,17 @@ impl XoStateDeltaProcessor {
                             &self.circuit_id,
                         );
                         helpers::insert_gameroom_notification(&conn, &[notification])?;
-                    } else {
-                        helpers::insert_xo_game(
+                    } else{
+                        helpers::add_message(
                             &conn,
-                            NewXoGame {
-                                circuit_id: self.circuit_id.clone(),
-                                game_name: game_state[0].clone(),
-                                game_board: game_state[1].clone(),
-                                game_status: game_state[2].clone(),
-                                player_1: game_state[3].clone(),
-                                player_2: game_state[4].clone(),
-                                created_time: time,
-                                updated_time: time,
+                            Message {
+                                message_name: items[0].to_string(),
+                                message_content: items[1].to_string(),
+                                message_type: MessageType::TEXT,
+                                id: items[3].parse::<u32>().unwrap(),
+                                previous_id: None,
+                                sender: items[5].to_string(),
+                                ..message_1
                             },
                         )?;
                         let notification = helpers::create_new_notification(

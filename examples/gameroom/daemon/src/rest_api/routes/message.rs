@@ -51,7 +51,7 @@ impl From<Message> for ApiMessage {
             message_content: msg.message_content.to_string(),
             message_type: msg.message_type.to_string(),
             sender: msg.sender.to_string(),
-            previous_id: msg.previous_id.to_i64(),
+            previous_id: msg.previous_id,
             participant_1: msg.participant_1.to_string(),
             participant_2: msg.participant_2.to_string(),
             created_time: msg
@@ -68,44 +68,44 @@ impl From<Message> for ApiMessage {
     }
 }
 
-pub async fn fetch_message(
-    pool: web::Data<ConnectionPool>,
-    circuit_id: web::Path<String>,
-    message_name: web::Path<String>,
-) -> Result<HttpResponse, Error> {
-    match web::block(move || fetch_message_from_db(pool, &circuit_id, &message_name)).await {
-        Ok(xo_game) => Ok(HttpResponse::Ok().json(SuccessResponse::new(message))),
-        Err(err) => {
-            match err {
-                error::BlockingError::Error(err) => match err {
-                    RestApiResponseError::NotFound(err) => {
-                        Ok(HttpResponse::NotFound().json(ErrorResponse::not_found(&err)))
-                    }
-                    _ => Ok(HttpResponse::BadRequest()
-                        .json(ErrorResponse::bad_request(&err.to_string()))),
-                },
-                error::BlockingError::Canceled => {
-                    debug!("Internal Server Error: {}", err);
-                    Ok(HttpResponse::InternalServerError().json(ErrorResponse::internal_error()))
-                }
-            }
-        }
-    }
-}
-
-fn fetch_message_from_db(
-    pool: web::Data<ConnectionPool>,
-    circuit_id: &str,
-    message_name: &str,
-) -> Result<ApiMessage, RestApiResponseError> {
-    if let Some(message) = helpers::fetch_message(&*pool.get()?, circuit_id, message_name)? {
-        return Ok(ApiMessage::from(message));
-    }
-    Err(RestApiResponseError::NotFound(format!(
-        "XO Game with name {} not found",
-        message_name
-    )))
-}
+//  pub async fn fetch_message(
+//     pool: web::Data<ConnectionPool>,
+//     circuit_id: web::Path<String>,
+//     message_name: web::Path<String>,
+// ) -> Result<HttpResponse, Error> {
+//     match web::block(move || fetch_message_from_db(pool, &circuit_id, &message_name)).await {
+//         Ok(xo_game) => Ok(HttpResponse::Ok().json(SuccessResponse::new(message))),
+//         Err(err) => {
+//             match err {
+//                 error::BlockingError::Error(err) => match err {
+//                     RestApiResponseError::NotFound(err) => {
+//                         Ok(HttpResponse::NotFound().json(ErrorResponse::not_found(&err)))
+//                     }
+//                     _ => Ok(HttpResponse::BadRequest()
+//                         .json(ErrorResponse::bad_request(&err.to_string()))),
+//                 },
+//                 error::BlockingError::Canceled => {
+//                     debug!("Internal Server Error: {}", err);
+//                     Ok(HttpResponse::InternalServerError().json(ErrorResponse::internal_error()))
+//                 }
+//             }
+//         }
+//     }
+// }
+//
+// fn fetch_message_from_db(
+//     pool: web::Data<ConnectionPool>,
+//     circuit_id: &str,
+//     message_name: &str,
+// ) -> Result<ApiMessage, RestApiResponseError> {
+//     if let Some(message) = helpers::fetch_message(&*pool.get()?, circuit_id, message_name)? {
+//         return Ok(ApiMessage::from(message));
+//     }
+//     Err(RestApiResponseError::NotFound(format!(
+//         "XO Game with name {} not found",
+//         message_name
+//     )))
+// }
 
 pub async fn list_messages(
     pool: web::Data<ConnectionPool>,

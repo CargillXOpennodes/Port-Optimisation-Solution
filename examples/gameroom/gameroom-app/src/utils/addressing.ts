@@ -14,9 +14,9 @@
 
 const crypto = require('crypto');
 
-export const XO_FAMILY_NAME = 'xo';
-export const XO_FAMILY_VERSION = '0.3.3';
-export const XO_FAMILY_PREFIX = '5b7349';
+export const MESSAGE_NAME = "sawtooth_message";
+export const MESSAGE_VERSION = "1.0";
+export const MESSAGE_PREFIX = "f8daf5";
 
 // The namespace registry prefix for global state (00ec00)
 const NAMESPACE_REGISTRY_PREFIX = '00ec00';
@@ -29,7 +29,7 @@ const CONTRACT_REGISTRY_PREFIX = '00ec01';
 
 export function calculateGameAddress(gameName: string): string {
   const gameNameHash =  crypto.createHash('sha512').update(gameName).digest('hex');
-  return `${XO_FAMILY_PREFIX}${gameNameHash.slice(0, 64)}`;
+  return `${MESSAGE_PREFIX}${gameNameHash.slice(0, 64)}`;
 
 }
 

@@ -45,14 +45,14 @@ use transact::{
 
 use super::AppAuthHandlerError;
 
-const XO_NAME: &str = "xo";
-const XO_VERSION: &str = "0.3.3";
-pub const XO_PREFIX: &str = "5b7349";
+const MESSAGE_NAME: &str = "sawtooth_message";
+const MESSAGE_VERSION: &str = "1.0";
+pub const MESSAGE_PREFIX: &str = "f8daf5";
 
-const XO_CONTRACT_PATH: &str = "/var/lib/gameroomd/xo-tp-rust.wasm";
+const MESSAGE_CONTRACT_PATH: &str = "/var/lib/gameroomd/message-tp-rust.wasm";
 
-/// Create and submit the Sabre transactions to setup the XO smart contract.
-pub fn setup_xo(
+/// Create and submit the Sabre transactions to setup the message smart contract.
+pub fn setup_message(
     private_key: &str,
     scabbard_admin_keys: Vec<String>,
     splinterd_url: &str,
@@ -75,8 +75,8 @@ pub fn setup_xo(
     let txns = vec![
         create_contract_registry_txn(scabbard_admin_keys.clone(), &signer)?,
         upload_contract_txn(&signer)?,
-        create_xo_namespace_registry_txn(scabbard_admin_keys, &signer)?,
-        xo_namespace_permissions_txn(&signer)?,
+        create_message_namespace_registry_txn(scabbard_admin_keys, &signer)?,
+        message_namespace_permissions_txn(&signer)?,
     ];
     let batch = BatchBuilder::new().with_transactions(txns).build(&signer)?;
     let payload = vec![batch].into_bytes()?;
@@ -140,12 +140,12 @@ fn new_signer(private_key: &str) -> Result<TransactSigner, AppAuthHandlerError> 
     Ok(SawtoothSigner::new_boxed(context, private_key).try_into()?)
 }
 
-fn create_contract_registry_txn(
+fn create_message_registry_txn(
     owners: Vec<String>,
     signer: &dyn Signer,
 ) -> Result<Transaction, AppAuthHandlerError> {
     Ok(CreateContractRegistryActionBuilder::new()
-        .with_name(XO_NAME.into())
+        .with_name(MESSAGE_NAME.into())
         .with_owners(owners)
         .into_payload_builder()?
         .into_transaction_builder(signer)?
@@ -153,7 +153,7 @@ fn create_contract_registry_txn(
 }
 
 fn upload_contract_txn(signer: &dyn Signer) -> Result<Transaction, AppAuthHandlerError> {
-    let contract_path = Path::new(XO_CONTRACT_PATH);
+    let contract_path = Path::new(MESSAGE_CONTRACT_PATH);
     let contract_file = File::open(contract_path).map_err(|err| {
         AppAuthHandlerError::SabreError(format!("Failed to load contract: {}", err))
     })?;
@@ -163,11 +163,11 @@ fn upload_contract_txn(signer: &dyn Signer) -> Result<Transaction, AppAuthHandle
         AppAuthHandlerError::SabreError(format!("IoError while reading contract: {}", err))
     })?;
 
-    let action_addresses = vec![XO_PREFIX.into()];
+    let action_addresses = vec![MESSAGE_PREFIX.to_string()];
 
     Ok(CreateContractActionBuilder::new()
-        .with_name(XO_NAME.into())
-        .with_version(XO_VERSION.into())
+        .with_name(MESSAGE_NAME.into())
+        .with_version(MESSAGE_VERSION.into())
         .with_inputs(action_addresses.clone())
         .with_outputs(action_addresses)
         .with_contract(contract)
@@ -176,22 +176,22 @@ fn upload_contract_txn(signer: &dyn Signer) -> Result<Transaction, AppAuthHandle
         .build(signer)?)
 }
 
-fn create_xo_namespace_registry_txn(
+fn create_message_namespace_registry_txn(
     owners: Vec<String>,
     signer: &dyn Signer,
 ) -> Result<Transaction, AppAuthHandlerError> {
     Ok(CreateNamespaceRegistryActionBuilder::new()
-        .with_namespace(XO_PREFIX.into())
+        .with_namespace(MESSAGE_PREFIX.into())
         .with_owners(owners)
         .into_payload_builder()?
         .into_transaction_builder(signer)?
         .build(signer)?)
 }
 
-fn xo_namespace_permissions_txn(signer: &dyn Signer) -> Result<Transaction, AppAuthHandlerError> {
+fn message_namespace_permissions_txn(signer: &dyn Signer) -> Result<Transaction, AppAuthHandlerError> {
     Ok(CreateNamespaceRegistryPermissionActionBuilder::new()
-        .with_namespace(XO_PREFIX.into())
-        .with_contract_name(XO_NAME.into())
+        .with_namespace(MESSAGE_PREFIX.into())
+        .with_contract_name(MESSAGE_NAME.into())
         .with_read(true)
         .with_write(true)
         .into_payload_builder()?
@@ -199,9 +199,9 @@ fn xo_namespace_permissions_txn(signer: &dyn Signer) -> Result<Transaction, AppA
         .build(signer)?)
 }
 
-pub fn get_xo_contract_address() -> Result<String, AppAuthHandlerError> {
+pub fn get_message_contract_address() -> Result<String, AppAuthHandlerError> {
     Ok(bytes_to_hex_str(&compute_contract_address(
-        XO_NAME, XO_VERSION,
+        MESSAGE_NAME, MESSAGE_VERSION,
     )?))
 }
 
