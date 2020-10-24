@@ -95,13 +95,13 @@ table! {
 }
 
 table! {
-    message (id) {
-        id -> Int8,
+    messages (id) {
+        id -> Integer,
         circuit_id -> Text,
         message_name -> Text,
         message_content -> Text,
         message_type -> Text,
-        previous_id -> Int8,
+        previous_id -> Nullable<Integer>,
         sender -> Text,
         participant_1 -> Text,
         participant_2 -> Text,

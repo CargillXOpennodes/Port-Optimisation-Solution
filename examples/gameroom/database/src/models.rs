@@ -164,12 +164,12 @@ pub struct NewGameroomNotification {
 #[derive(Clone, Queryable, Identifiable, Associations, Insertable, AsChangeset)]
 #[table_name = "messages"]
 pub struct Message {
-    pub id: i64,
+    pub id: i32,
     pub circuit_id: String,
     pub message_name: String,
     pub message_content: String,
     pub message_type: String,
-    pub previous_id: Option<i64>,
+    pub previous_id: Option<i32>,
     pub sender: String,
     pub participant_1: String,
     pub participant_2: String,
@@ -180,12 +180,12 @@ pub struct Message {
 #[derive(Debug, Insertable)]
 #[table_name = "messages"]
 pub struct NewMessage {
-    pub id: i64,
+    pub id: i32,
     pub circuit_id: String,
     pub message_name: String,
     pub message_content: String,
     pub message_type: String,
-    pub previous_id: Option<i64>,
+    pub previous_id: Option<i32>,
     pub sender: String,
     pub participant_1: String,
     pub participant_2: String,

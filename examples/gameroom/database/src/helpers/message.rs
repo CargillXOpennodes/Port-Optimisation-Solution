@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::models::{NewMessage, Message};
-use crate::schema::message;
+use crate::models::{Message};
+use crate::schema::messages;
 
 use diesel::{
-    dsl::insert_into, pg::PgConnection, prelude::*, result::Error::NotFound, QueryResult,
+    dsl::insert_into, pg::PgConnection, prelude::*, QueryResult,
 };
 
 pub fn get_latest_message_id(circuit_id: &str, conn: &PgConnection) -> QueryResult<i64> {
-    message::table
-        .filter(message::circuit_id.eq(circuit_id))
+    messages::table
+        .filter(messages::circuit_id.eq(circuit_id))
         .count()
         .get_result(conn)
 }
@@ -32,9 +32,9 @@ pub fn list_messages(
     limit: i64,
     offset: i64,
 ) -> QueryResult<Vec<Message>> {
-    message::table
-        .filter(message::circuit_id.eq(circuit_id))
-        .order_by(message::id.desc())
+    messages::table
+        .filter(messages::circuit_id.eq(circuit_id))
+        .order_by(messages::id.desc())
         .limit(limit)
         .offset(offset)
         .load::<Message>(conn)
@@ -64,7 +64,7 @@ pub fn list_messages(
 // }
 
 pub fn add_message(conn: &PgConnection, sent_message: Message) -> QueryResult<()> {
-    insert_into(message::table)
+    insert_into(messages::table)
         .values(sent_message.clone())
         .execute(conn)
         .map(|_| ())
@@ -82,5 +82,5 @@ pub fn add_message(conn: &PgConnection, sent_message: Message) -> QueryResult<()
 }
 
 pub fn get_message_count(conn: &PgConnection) -> QueryResult<i64> {
-    message::table.count().get_result(conn)
+    messages::table.count().get_result(conn)
 }

@@ -92,14 +92,16 @@ CREATE TABLE IF NOT EXISTS gameroom_notification (
   read                      BOOLEAN     NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS xo_games (
+CREATE TABLE IF NOT EXISTS messages (
   id                        BIGSERIAL   PRIMARY KEY,
   circuit_id                TEXT        NOT NULL,
-  game_name                 TEXT        NOT NULL,
-  player_1                  TEXT        NOT NULL,
-  player_2                  TEXT        NOT NULL,
-  game_status               TEXT        NOT NULL,
-  game_board                TEXT        NOT NULL,
+  message_name              TEXT        NOT NULL,
+  message_content           TEXT        NOT NULL,
+  message_type              TEXT        NOT NULL,
+  previous_id               INTEGER,
+  sender                    TEXT        NOT NULL,
+  participant_1             TEXT        NOT NULL,
+  participant_2             TEXT        NOT NULL,
   created_time              TIMESTAMP   NOT NULL,
   updated_time              TIMESTAMP   NOT NULL,
   FOREIGN KEY (circuit_id) REFERENCES gameroom(circuit_id) ON DELETE CASCADE

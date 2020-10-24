@@ -27,7 +27,7 @@ use scabbard::service::{StateChange, StateChangeEvent};
 
 use crate::authorization_handler::sabre::{get_message_contract_address, MESSAGE_PREFIX};
 use crate::authorization_handler::AppAuthHandlerError;
-use gameroom_database::schema::message::dsl::message;
+use gameroom_database::schema::messages::dsl::message;
 
 pub struct MessageStateDeltaProcessor {
     circuit_id: String,

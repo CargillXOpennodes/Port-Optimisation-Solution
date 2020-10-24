@@ -49,7 +49,7 @@ const MESSAGE_NAME: &str = "sawtooth_message";
 const MESSAGE_VERSION: &str = "1.0";
 pub const MESSAGE_PREFIX: &str = "f8daf5";
 
-const MESSAGE_CONTRACT_PATH: &str = "/var/lib/gameroomd/message-tp-rust.wasm";
+const MESSAGE_CONTRACT_PATH: &str = "message-tp-rust.wasm";
 
 /// Create and submit the Sabre transactions to setup the message smart contract.
 pub fn setup_message(

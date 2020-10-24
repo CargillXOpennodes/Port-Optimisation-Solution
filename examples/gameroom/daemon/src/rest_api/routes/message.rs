@@ -29,13 +29,13 @@ use gameroom_database::schema::message::dsl::message;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApiMessage {
-    id : i64,
+    id : i32,
     circuit_id: String,
     message_name: String,
     message_content: String,
     message_type: String,
     sender: String,
-    previous_id: Option<i64>,
+    previous_id: Option<i32>,
     participant_1: String,
     participant_2: String,
     created_time: u64,
