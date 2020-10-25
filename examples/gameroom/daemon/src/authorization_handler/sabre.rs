@@ -140,7 +140,7 @@ fn new_signer(private_key: &str) -> Result<TransactSigner, AppAuthHandlerError> 
     Ok(SawtoothSigner::new_boxed(context, private_key).try_into()?)
 }
 
-fn create_message_registry_txn(
+fn create_contract_registry_txn(
     owners: Vec<String>,
     signer: &dyn Signer,
 ) -> Result<Transaction, AppAuthHandlerError> {

@@ -19,7 +19,6 @@ mod node;
 mod notification;
 mod proposal;
 mod submit;
-mod xo_games;
 mod message;
 
 pub use authenticate::*;
@@ -29,7 +28,7 @@ pub use node::*;
 pub use notification::*;
 pub use proposal::*;
 pub use submit::*;
-pub use xo_games::*;
+pub use message::*;
 
 use percent_encoding::{AsciiSet, CONTROLS};
 use serde::{Deserialize, Serialize};

@@ -15,8 +15,8 @@
 use std::collections::HashMap;
 use std::time::{Duration, SystemTime};
 
-use actix_web::{error, web, Error, HttpResponse};
-use gameroom_database::{helpers, models::XoGame, ConnectionPool};
+use actix_web::{web, Error, HttpResponse};
+use gameroom_database::{helpers, models::Message, ConnectionPool};
 
 use crate::rest_api::RestApiResponseError;
 
@@ -24,8 +24,6 @@ use super::{
     get_response_paging_info, validate_limit, ErrorResponse, SuccessResponse, DEFAULT_LIMIT,
     DEFAULT_OFFSET,
 };
-use gameroom_database::models::Message;
-use gameroom_database::schema::messages::dsl::messages;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApiMessage {
@@ -82,7 +80,7 @@ pub async fn list_messages(
         .get("limit")
         .map(ToOwned::to_owned)
         .unwrap_or_else(|| DEFAULT_LIMIT);
-    let base_link = format!("api/xo/{}/games?", &circuit_id);
+    let base_link = format!("api/message/{}/messages?", &circuit_id);
 
     match web::block(move || list_messages_from_db(pool, &circuit_id.clone(), limit, offset)).await
     {

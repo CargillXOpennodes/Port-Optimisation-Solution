@@ -23,22 +23,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="11858e85-6e16-4092-afc6-50c859ab2f13" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../daemon/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../daemon/.idea/checkstyle-idea.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../daemon/.idea/daemon.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../daemon/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../daemon/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../daemon/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/checkstyle-idea.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/smart-contract.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/openapi.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/openapi.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/authorization_handler/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/authorization_handler/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/authorization_handler/sabre.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/authorization_handler/sabre.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../daemon/src/authorization_handler/state_delta.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/authorization_handler/state_delta.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/rest_api/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/rest_api/mod.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../daemon/src/rest_api/routes/message.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/rest_api/routes/message.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../database/src/models.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../database/src/models.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/rest_api/routes/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/rest_api/routes/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/rest_api/routes/xo_games.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../database/src/helpers/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../database/src/helpers/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,6 +85,7 @@
       <workItem from="1603619274502" duration="83000" />
       <workItem from="1603619366284" duration="85000" />
       <workItem from="1603619457768" duration="116000" />
+      <workItem from="1603624756241" duration="1451000" />
     </task>
     <servers />
   </component>

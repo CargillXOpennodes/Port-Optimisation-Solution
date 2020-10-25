@@ -22,7 +22,6 @@ members = [
     "examples/gameroom/cli",
     "examples/gameroom/database",
     "examples/gameroom/daemon",
-    "examples/gameroom/smart-contract",
     "services/health",
     "services/scabbard/cli",
     "services/scabbard/libscabbard",
