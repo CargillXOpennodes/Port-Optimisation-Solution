@@ -157,13 +157,13 @@ pub fn run(
                         web::resource("/subscribe").route(web::get().to(routes::connect_socket)),
                     )
                     .service(
-                        web::scope("/xo/{circuit_id}").service(
-                            web::scope("/games")
-                                .service(
-                                    web::resource("/{game_id}")
-                                        .route(web::get().to(routes::fetch_xo)),
-                                )
-                                .service(web::resource("").route(web::get().to(routes::list_xo))),
+                        web::scope("/message/{circuit_id}").service(
+                            web::scope("/messages")
+                            //     .service(
+                            //         web::resource("/{game_id}")
+                            //             .route(web::get().to(routes::fetch_xo)),
+                            //     )
+                                .service(web::resource("").route(web::get().to(routes::list_messages))),
                         ),
                     )
             })

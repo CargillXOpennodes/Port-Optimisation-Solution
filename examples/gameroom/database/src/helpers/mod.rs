@@ -33,5 +33,5 @@ pub use notification::{
     list_unread_notifications_with_paging, update_gameroom_notification,
 };
 pub use message::{
-    get_latest_message_id, list_messages, add_message, get_message_count,
+    get_latest_message_id, get_latest_message, list_messages, add_message, get_message_count,
 };

@@ -20,14 +20,13 @@ use std::{error::Error, fmt, time::SystemTime};
 use diesel::connection::Connection;
 use gameroom_database::{
     error, helpers,
-    models::{NewMessage, Message},
+    models::{Message, MessageType},
     ConnectionPool,
 };
 use scabbard::service::{StateChange, StateChangeEvent};
 
 use crate::authorization_handler::sabre::{get_message_contract_address, MESSAGE_PREFIX};
 use crate::authorization_handler::AppAuthHandlerError;
-use gameroom_database::schema::messages::dsl::message;
 
 pub struct MessageStateDeltaProcessor {
     circuit_id: String,
@@ -44,7 +43,7 @@ impl MessageStateDeltaProcessor {
         requester: &str,
         db_pool: &ConnectionPool,
     ) -> Result<Self, AppAuthHandlerError> {
-        Ok(MessageDeltaProcessor {
+        Ok(MessageStateDeltaProcessor {
             circuit_id: circuit_id.into(),
             node_id: node_id.to_string(),
             requester: requester.to_string(),
@@ -110,71 +109,75 @@ impl MessageStateDeltaProcessor {
 
                     Ok(())
                 })
-                .map_err(StateDeltaError::from)
+                    .map_err(StateDeltaError::from)
             }
             StateChange::Set { key, value } if &key[..6] == MESSAGE_PREFIX => {
                 let time = SystemTime::now();
-                let game_state: Vec<String> = String::from_utf8(value.to_vec())
+                let message_state: Vec<String> = String::from_utf8(value.to_vec())
                     .map_err(|err| StateDeltaError::MessagePayloadParseError(format!("{:?}", err)))
                     .map(|s| s.split(',').map(String::from).collect())?;
 
                 let conn = &*self.db_pool.get()?;
                 conn.transaction::<_, error::DatabaseError, _>(|| {
-                    if let Some(message_1) =
-                        helpers::fetch_message(&conn, &self.circuit_id, &game_state[0])
-                    {
-                        let mut m = Message {
-                            message_name: items[0].to_string(),
-                            message_content: items[1].to_string(),
-                            message_type: MessageType::TEXT,
-                            id: items[3].parse::<u32>().unwrap(),
-                            previous_id: None,
-                            sender: items[5].to_string(),
-                            ..message_1
-                        };
+                    let m;
+                    let notification;
+                    match helpers::get_latest_message(&self.circuit_id, &conn)? {
+                        Some(message) => {
+                            m = Message {
+                                message_content: message_state[1].to_string(),
+                                message_type: MessageType::TEXT.to_string(),
+                                id: message_state[3].parse::<i32>().unwrap(),
+                                previous_id: Some(message_state[4].to_string().parse::<i32>().unwrap()),
+                                sender: message_state[5].to_string(),
+                                updated_time: time.clone(),
+                                participant_2: message_state[6].to_string(),
+                                ..message
+                            };
 
-                        if let Some(n) = items[4].to_string().parse::<i64>() {
-                            m.previous_id = Some(n);
+                            notification = helpers::create_new_notification(
+                                &format!("new_message_created:{}", message_state[0]),
+                                &self.requester,
+                                &self.node_id,
+                                &self.circuit_id,
+                            );
                         }
-
-                        helpers::add_message(
-                            &conn,m
-                        )?;
-
-                        let notification = helpers::create_new_notification(
-                            &format!("game_updated:{}", game_state[0]),
-                            &self.requester,
-                            &self.node_id,
-                            &self.circuit_id,
-                        );
-                        helpers::insert_gameroom_notification(&conn, &[notification])?;
-                    } else{
-                        helpers::add_message(
-                            &conn,
-                            Message {
-                                message_name: items[0].to_string(),
-                                message_content: items[1].to_string(),
-                                message_type: MessageType::TEXT,
-                                id: items[3].parse::<u32>().unwrap(),
+                        None => {
+                            m = Message {
+                                message_name: message_state[0].to_string(),
+                                message_content: message_state[1].to_string(),
+                                message_type: MessageType::TEXT.to_string(),
+                                id: message_state[3].parse::<i32>().unwrap(),
                                 previous_id: None,
-                                sender: items[5].to_string(),
-                                ..message_1
-                            },
-                        )?;
-                        let notification = helpers::create_new_notification(
-                            &format!("new_game_created:{}", game_state[0]),
-                            &self.requester,
-                            &self.node_id,
-                            &self.circuit_id,
-                        );
-                        helpers::insert_gameroom_notification(&conn, &[notification])?;
-                    }
+                                sender: message_state[5].to_string(),
+                                participant_1: message_state[5].to_string(),
+                                participant_2: message_state[6].to_string(),
+                                created_time: time.clone(),
+                                circuit_id: self.circuit_id.clone(),
+                                updated_time: time.clone(),
+                            };
+
+                            notification = helpers::create_new_notification(
+                                &format!("message_updated:{}", message_state[0]),
+                                &self.requester,
+                                &self.node_id,
+                                &self.circuit_id,
+                            );
+                        }
+                    };
+
+                    helpers::insert_gameroom_notification(&conn, &[notification])?;
+
+                    helpers::add_message(
+                        &conn, m,
+                    )?;
 
                     Ok(())
                 })
                 .map_err(StateDeltaError::from)
             }
-            StateChange::Delete { .. } => {
+            StateChange::Delete {
+                ..
+            } => {
                 debug!("Delete state skipping...");
                 Ok(())
             }
@@ -188,14 +191,14 @@ impl MessageStateDeltaProcessor {
 
 #[derive(Debug)]
 pub enum StateDeltaError {
-    XoPayloadParseError(String),
+    MessagePayloadParseError(String),
     DatabaseError(error::DatabaseError),
 }
 
 impl Error for StateDeltaError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
-            StateDeltaError::XoPayloadParseError(_) => None,
+            StateDeltaError::MessagePayloadParseError(_) => None,
             StateDeltaError::DatabaseError(err) => Some(err),
         }
     }
@@ -204,7 +207,7 @@ impl Error for StateDeltaError {
 impl fmt::Display for StateDeltaError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            StateDeltaError::XoPayloadParseError(err) => {
+            StateDeltaError::MessagePayloadParseError(err) => {
                 write!(f, "Failed to parse xo payload: {}", err)
             }
             StateDeltaError::DatabaseError(err) => write!(f, "Database error: {}", err),

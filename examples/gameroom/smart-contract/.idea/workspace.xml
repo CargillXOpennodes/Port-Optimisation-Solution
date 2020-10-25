@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="CargoProjects">
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="11858e85-6e16-4092-afc6-50c859ab2f13" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../daemon/openapi.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/openapi.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/authorization_handler/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/authorization_handler/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/authorization_handler/sabre.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/authorization_handler/sabre.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/authorization_handler/state_delta.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/authorization_handler/state_delta.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/rest_api/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/rest_api/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/rest_api/routes/message.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/rest_api/routes/message.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/rest_api/routes/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../daemon/src/rest_api/routes/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../daemon/src/rest_api/routes/xo_games.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../database/src/helpers/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../database/src/helpers/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="xf7ze9tr" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="C:\Program Files\JetBrains\IntelliJ IDEA 2020.2\plugins\maven\lib\maven3" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1jMgFiCRdhy3fkw2epfsO5M38JW" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+    <property name="org.rust.disableDetachedFileInspectionC:/Users/rsadi/Cargill/GameRoom/examples/gameroom/smart-contract/src/main.rs" value="true" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.General" />
+  </component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+    <option name="version" value="2" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="11858e85-6e16-4092-afc6-50c859ab2f13" name="Default Changelist" comment="" />
+      <created>1603619273272</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1603619273272</updated>
+      <workItem from="1603619274502" duration="83000" />
+      <workItem from="1603619366284" duration="85000" />
+      <workItem from="1603619457768" duration="116000" />
+      <workItem from="1603624756241" duration="1451000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="267" y="19" key="#Inspections" timestamp="1603619306553">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="267" y="19" key="#Inspections/0.0.1280.680@0.0.1280.680" timestamp="1603619306553" />
+  </component>
+</project>
