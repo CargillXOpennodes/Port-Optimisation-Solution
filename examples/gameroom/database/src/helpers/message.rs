@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use num_traits::cast::ToPrimitive;
 use crate::models::{Message};
 use crate::schema::messages;
 
 use diesel::{
-    dsl::insert_into, pg::PgConnection, prelude::*, QueryResult,
+    dsl::insert_into, pg::PgConnection, prelude::*, result::Error::NotFound, QueryResult,
 };
 
 pub fn get_latest_message_id(circuit_id: &str, conn: &PgConnection) -> QueryResult<i64> {
@@ -24,6 +25,22 @@ pub fn get_latest_message_id(circuit_id: &str, conn: &PgConnection) -> QueryResu
         .filter(messages::circuit_id.eq(circuit_id))
         .count()
         .get_result(conn)
+}
+
+pub fn get_latest_message(circuit_id: &str, conn: &PgConnection) -> QueryResult<Option<Message>> {
+     get_latest_message_id(circuit_id, conn)
+        .and_then(|id|
+            messages::table
+                .filter(
+                    messages::id
+                        .eq(id.to_i32().unwrap() - 1)
+                        .and(messages::circuit_id.eq(circuit_id)),
+                )
+                .first::<Message>(conn)
+                .map(Some)
+                .or_else(|err| if err == NotFound { Ok(None) } else { Err(err) })
+        )
+        .or_else(|err| Err(err))
 }
 
 pub fn list_messages(
@@ -40,45 +57,11 @@ pub fn list_messages(
         .load::<Message>(conn)
 }
 
-// pub fn fetch_message(
-//     conn: &PgConnection,
-//     circuit_id: &str,
-//     name: &str,
-// ) -> QueryResult<Option<Message>> {
-//     message::table
-//         .filter(
-//             message::message_name
-//                 .eq(name)
-//                 .and(message::circuit_id.eq(circuit_id)),
-//         )
-//         .first::<Message>(conn)
-//         .map(Some)
-//         .or_else(|err| if err == NotFound { Ok(None) } else { Err(err) })
-// }
-
-// pub fn insert_xo_game(conn: &PgConnection, game: NewXoGame) -> QueryResult<()> {
-//     insert_into(xo_games::table)
-//         .values(game)
-//         .execute(conn)
-//         .map(|_| ())
-// }
-
 pub fn add_message(conn: &PgConnection, sent_message: Message) -> QueryResult<()> {
     insert_into(messages::table)
         .values(sent_message.clone())
         .execute(conn)
         .map(|_| ())
-    
-    // diesel::update(
-    //     xo_games::table.filter(
-    //         xo_games::game_name
-    //             .eq(&updated_game.game_name)
-    //             .and(xo_games::circuit_id.eq(&updated_game.circuit_id)),
-    //     ),
-    // )
-    // .set(updated_game.clone())
-    // .execute(conn)
-    // .map(|_| ())
 }
 
 pub fn get_message_count(conn: &PgConnection) -> QueryResult<i64> {

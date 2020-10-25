@@ -177,22 +177,6 @@ pub struct Message {
     pub updated_time: SystemTime,
 }
 
-#[derive(Debug, Insertable)]
-#[table_name = "messages"]
-pub struct NewMessage {
-    pub id: i32,
-    pub circuit_id: String,
-    pub message_name: String,
-    pub message_content: String,
-    pub message_type: String,
-    pub previous_id: Option<i32>,
-    pub sender: String,
-    pub participant_1: String,
-    pub participant_2: String,
-    pub created_time: SystemTime,
-    pub updated_time: SystemTime,
-}
-
 #[derive(Queryable, PartialEq, Debug)]
 pub struct ActiveGameroom {
     pub circuit_id: String,
