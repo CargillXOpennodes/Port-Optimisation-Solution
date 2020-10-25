@@ -25,7 +25,7 @@ use super::{
     DEFAULT_OFFSET,
 };
 use gameroom_database::models::Message;
-use gameroom_database::schema::message::dsl::message;
+use gameroom_database::schema::messages::dsl::messages;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApiMessage {
@@ -67,45 +67,6 @@ impl From<Message> for ApiMessage {
         }
     }
 }
-
-//  pub async fn fetch_message(
-//     pool: web::Data<ConnectionPool>,
-//     circuit_id: web::Path<String>,
-//     message_name: web::Path<String>,
-// ) -> Result<HttpResponse, Error> {
-//     match web::block(move || fetch_message_from_db(pool, &circuit_id, &message_name)).await {
-//         Ok(xo_game) => Ok(HttpResponse::Ok().json(SuccessResponse::new(message))),
-//         Err(err) => {
-//             match err {
-//                 error::BlockingError::Error(err) => match err {
-//                     RestApiResponseError::NotFound(err) => {
-//                         Ok(HttpResponse::NotFound().json(ErrorResponse::not_found(&err)))
-//                     }
-//                     _ => Ok(HttpResponse::BadRequest()
-//                         .json(ErrorResponse::bad_request(&err.to_string()))),
-//                 },
-//                 error::BlockingError::Canceled => {
-//                     debug!("Internal Server Error: {}", err);
-//                     Ok(HttpResponse::InternalServerError().json(ErrorResponse::internal_error()))
-//                 }
-//             }
-//         }
-//     }
-// }
-//
-// fn fetch_message_from_db(
-//     pool: web::Data<ConnectionPool>,
-//     circuit_id: &str,
-//     message_name: &str,
-// ) -> Result<ApiMessage, RestApiResponseError> {
-//     if let Some(message) = helpers::fetch_message(&*pool.get()?, circuit_id, message_name)? {
-//         return Ok(ApiMessage::from(message));
-//     }
-//     Err(RestApiResponseError::NotFound(format!(
-//         "XO Game with name {} not found",
-//         message_name
-//     )))
-// }
 
 pub async fn list_messages(
     pool: web::Data<ConnectionPool>,

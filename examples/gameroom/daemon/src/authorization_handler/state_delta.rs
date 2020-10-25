@@ -20,14 +20,14 @@ use std::{error::Error, fmt, time::SystemTime};
 use diesel::connection::Connection;
 use gameroom_database::{
     error, helpers,
-    models::{NewMessage, Message},
+    models::{Message, MessageType},
     ConnectionPool,
 };
 use scabbard::service::{StateChange, StateChangeEvent};
 
 use crate::authorization_handler::sabre::{get_message_contract_address, MESSAGE_PREFIX};
 use crate::authorization_handler::AppAuthHandlerError;
-use gameroom_database::schema::messages::dsl::message;
+use gameroom_database::schema::messages::dsl::messages;
 
 pub struct MessageStateDeltaProcessor {
     circuit_id: String,
@@ -121,7 +121,7 @@ impl MessageStateDeltaProcessor {
                 let conn = &*self.db_pool.get()?;
                 conn.transaction::<_, error::DatabaseError, _>(|| {
                     if let Some(message_1) =
-                        helpers::fetch_message(&conn, &self.circuit_id, &game_state[0])
+                        helpers::get_latest_message(&conn, &self.circuit_id, &game_state[0])
                     {
                         let mut m = Message {
                             message_name: items[0].to_string(),

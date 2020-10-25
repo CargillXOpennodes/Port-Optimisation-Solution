@@ -186,3 +186,19 @@ pub struct ActiveGameroom {
     pub requester: String,
     pub requester_node_id: String,
 }
+
+// for message type handling
+#[derive(Debug, Copy, Clone)]
+pub enum MessageType {
+    TEXT,
+    ERROR
+}
+
+impl ToString for MessageType {
+    fn to_string(&self) -> String {
+        return match self {
+            MessageType::TEXT => "TEXT".to_string(),
+            _ => "error".to_string()
+        }
+    }
+}
