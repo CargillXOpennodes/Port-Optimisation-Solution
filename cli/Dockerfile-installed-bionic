@@ -69,6 +69,10 @@ RUN apt-get update \
  && apt-get install -y -q \
    curl \
    man \
- && mandb \
- && dpkg --unpack /tmp/splinter-cli_*.deb \
- && apt-get -f -y install
+ && mandb
+
+ RUN dpkg --unpack /tmp/splinter-cli_*.deb; exit 0
+
+ RUN rm -rf /var/lib/dpkg/info/splinter-cli.postinst
+ 
+ RUN apt-get -f -y install

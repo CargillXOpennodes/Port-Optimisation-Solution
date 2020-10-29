@@ -1,0 +1,19 @@
+{
+  "name": "node_playground",
+  "version": "1.0.0",
+  "description": "",
+  "main": "start.js",
+  "scripts": {
+    "test": "node -r esm index.js",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "run": "node -r esm index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/register": "^7.12.1"
+  }
+}

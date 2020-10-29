@@ -48,6 +48,8 @@
 
 /examples/gameroom/gameroom-app/src/compiled_protos.json
 
+/examples/gameroom/test_backend/node_modules
+
 /services/scabbard/cli/packaging/man/*.1
 
 /tests/Cargo.lock

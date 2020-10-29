@@ -112,24 +112,24 @@ services:
         POSTGRES_PASSWORD: gameroom_example
         POSTGRES_DB: gameroom
 
-    gameroom-app-acme:
-      build:
-        context: ../..
-        dockerfile: ./examples/gameroom/gameroom-app/Dockerfile-installed
-        args:
-          VUE_APP_BRAND: "acme"
-          REPO_VERSION: ${REPO_VERSION}
-      image: gameroom-app-acme
-      container_name: gameroom-app-acme
-      networks:
-        gameroom:
-          ipv4_address: 172.28.2.2
-      environment:
-        - VUE_APP_BRAND=acme
-      expose:
-        - 80
-      ports:
-        - '8080:80'
+    # gameroom-app-acme:
+    #   build:
+    #     context: ../..
+    #     dockerfile: ./examples/gameroom/gameroom-app/Dockerfile-installed
+    #     args:
+    #       VUE_APP_BRAND: "acme"
+    #       REPO_VERSION: ${REPO_VERSION}
+    #   image: gameroom-app-acme
+    #   container_name: gameroom-app-acme
+    #   networks:
+    #     gameroom:
+    #       ipv4_address: 172.28.2.2
+    #   environment:
+    #     - VUE_APP_BRAND=acme
+    #   expose:
+    #     - 80
+    #   ports:
+    #     - '8080:80'
 
     gameroomd-acme:
         image: gameroomd
@@ -199,6 +199,7 @@ services:
             sleep 1
           done && \
           splinter database migrate -C postgres://admin:admin@splinterd-db-acme:5432/splinter && \
+          mkdir -p /etc/splinter/certs && \
           splinter cert generate --skip && \
           splinterd -c ./configs/splinterd-node-acme.toml -vv \
               --database postgres://admin:admin@splinterd-db-acme:5432/splinter \
@@ -249,24 +250,24 @@ services:
         POSTGRES_PASSWORD: gameroom_example
         POSTGRES_DB: gameroom
 
-    gameroom-app-bubba:
-      build:
-        context: ../..
-        dockerfile: ./examples/gameroom/gameroom-app/Dockerfile-installed
-        args:
-          VUE_APP_BRAND: "bubba"
-          REPO_VERSION: ${REPO_VERSION}
-      image: gameroom-app-bubba
-      container_name: gameroom-app-bubba
-      networks:
-        gameroom:
-          ipv4_address: 172.28.3.2
-      environment:
-        - VUE_APP_BRAND=bubba
-      expose:
-        - 80
-      ports:
-        - '8081:80'
+    # gameroom-app-bubba:
+    #   build:
+    #     context: ../..
+    #     dockerfile: ./examples/gameroom/gameroom-app/Dockerfile-installed
+    #     args:
+    #       VUE_APP_BRAND: "bubba"
+    #       REPO_VERSION: ${REPO_VERSION}
+    #   image: gameroom-app-bubba
+    #   container_name: gameroom-app-bubba
+    #   networks:
+    #     gameroom:
+    #       ipv4_address: 172.28.3.2
+    #   environment:
+    #     - VUE_APP_BRAND=bubba
+    #   expose:
+    #     - 80
+    #   ports:
+    #     - '8081:80'
 
     gameroomd-bubba:
         image: gameroomd
@@ -336,6 +337,7 @@ services:
             sleep 1
           done && \
           splinter database migrate -C postgres://admin:admin@splinterd-db-bubba:5432/splinter && \
+          mkdir -p /etc/splinter/certs && \
           splinter cert generate --skip && \
           splinterd -c ./configs/splinterd-node-bubba.toml -vv \
               --database postgres://admin:admin@splinterd-db-bubba:5432/splinter \

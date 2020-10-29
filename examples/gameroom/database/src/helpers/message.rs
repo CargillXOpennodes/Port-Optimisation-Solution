@@ -28,7 +28,7 @@ pub fn get_latest_message_id(circuit_id: &str, conn: &PgConnection) -> QueryResu
 }
 
 pub fn get_latest_message(circuit_id: &str, conn: &PgConnection) -> QueryResult<Option<Message>> {
-     get_latest_message_id(circuit_id, conn)
+    get_latest_message_id(circuit_id, conn)
         .and_then(|id|
             messages::table
                 .filter(
