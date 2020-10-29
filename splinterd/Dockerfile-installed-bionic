@@ -81,10 +81,23 @@ RUN echo "SPLINTERD_ARGS = '$SPLINTERD_ARGS'" > SPLINTERD_ARGS
 COPY --from=builder /tmp/splinter-*.deb /tmp/
 COPY --from=builder /commit-hash /commit-hash
 
-RUN apt-get update \
+# RUN apt-get update \
+# && apt-get install -y -q \
+#    man \
+#    postgresql-client \
+# && mandb \
+# && dpkg --unpack /tmp/splinter-*.deb \
+# && apt-get -f -y install
+
+ RUN apt-get update \
  && apt-get install -y -q \
-    man \
-    postgresql-client \
- && mandb \
- && dpkg --unpack /tmp/splinter-*.deb \
- && apt-get -f -y install
+     curl \
+     man \
+     postgresql-client \
+ && mandb
+
+ RUN dpkg --unpack /tmp/splinter-*.deb; exit 0
+
+ RUN rm -rf /var/lib/dpkg/info/splinter-*.postinst
+ 
+ RUN apt-get -f -y install
