@@ -11,22 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ------------------------------------------------------------------------------
 
-[workspace]
+# Config file format version
+version = "1"
 
-members = [
-    "cli",
-    "client",
-    "libsplinter",
-    "splinterd",
-    "examples/gameroom/cli",
-    "examples/gameroom/database",
-    "examples/gameroom/daemon",
-    "services/health",
-    "services/scabbard/cli",
-    "services/scabbard/libscabbard",
-]
+node_id = "delta-node-000"
 
-exclude = [
-    "examples/gameroom/smart-contract",
-]
+# Endpoints used for daemon to daemon communication.
+network_endpoints = ["tcps://127.0.0.1:8044"]
+
+# A list of splinter nodes the daemon will automatically
+# connect to on start up.
+peers = []
+
+# The type of storage that should be used to store circuit state. Option are
+# currently "yaml" or "memory"
+storage = "yaml"
+
+# Rest api address.
+rest_api_endpoint = "localhost:8085"

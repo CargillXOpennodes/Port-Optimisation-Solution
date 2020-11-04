@@ -78,6 +78,7 @@ impl MessageStateDeltaProcessor {
 
     fn handle_state_change(&self, change: &StateChange) -> Result<(), StateDeltaError> {
         debug!("Received state change: {}", change);
+        debug!("Contract address: {}", self.contract_address);
         match change {
             StateChange::Set { key, .. } if key == &self.contract_address => {
                 debug!("Message contract created successfully");
@@ -182,6 +183,7 @@ impl MessageStateDeltaProcessor {
                 Ok(())
             }
             _ => {
+            
                 debug!("Unrecognized state change skipping...");
                 Ok(())
             }

@@ -29,22 +29,22 @@ cfg_if! {
     }
 }
 
-use crate::handler::message::Message;
+use crate::handler::status::Status;
 
-pub fn get_message_prefix() -> String {
+pub fn get_status_prefix() -> String {
     let mut sha = Sha512::new();
-    sha.input_str("message");
+    sha.input_str("sawtooth_message");
     sha.result_str()[..6].to_string()
 }
 
-pub struct MessageState<'a> {
+pub struct StatusState<'a> {
     context: &'a mut dyn TransactionContext,
     address_map: HashMap<String, Option<String>>,
 }
 
-impl<'a> MessageState<'a> {
-    pub fn new(context: &'a mut dyn TransactionContext) -> MessageState {
-        MessageState {
+impl<'a> StatusState<'a> {
+    pub fn new(context: &'a mut dyn TransactionContext) -> StatusState {
+        StatusState {
             context,
             address_map: HashMap::new(),
         }
@@ -53,43 +53,43 @@ impl<'a> MessageState<'a> {
     fn calculate_address(name: &str) -> String {
         let mut sha = Sha512::new();
         sha.input_str(name);
-        get_message_prefix() + &sha.result_str()[..64].to_string()
+        get_status_prefix() + &sha.result_str()[..64].to_string()
     }
 
-    pub fn delete_message(&mut self, message_name: &str) -> Result<(), ApplyError> {
-        let mut messages = self._load_messages(message_name)?;
-        messages.remove(message_name);
-        if messages.is_empty() {
-            self._delete_message(message_name)?;
+    pub fn delete_status(&mut self, status_name: &str) -> Result<(), ApplyError> {
+        let mut statuses = self._load_statuses(status_name)?;
+        statuses.remove(status_name);
+        if statuses.is_empty() {
+            self._delete_status(status_name)?;
         } else {
-            self._store_message(message_name, messages)?;
+            self._store_status(status_name, statuses)?;
         }
         Ok(())
     }
 
-    pub fn set_message(&mut self, message_name: &str, m: Message) -> Result<(), ApplyError> {
-        let mut messages = self._load_messages(message_name)?;
-        messages.insert(message_name.to_string(), m);
-        self._store_message(message_name, messages)?;
+    pub fn set_status(&mut self, status_name: &str, s: Status) -> Result<(), ApplyError> {
+        let mut statuses = self._load_statuses(status_name)?;
+        statuses.insert(status_name.to_string(), s);
+        self._store_status(status_name, statuses)?;
         Ok(())
     }
 
-    pub fn get_message(&mut self, message_name: &str) -> Result<Option<Message>, ApplyError> {
-        let messages = self._load_messages(message_name)?;
-        if messages.contains_key(message_name) {
-            Ok(Some(messages[message_name].clone()))
+    pub fn get_status(&mut self, status_name: &str) -> Result<Option<Status>, ApplyError> {
+        let statuses = self._load_statuses(status_name)?;
+        if statuses.contains_key(status_name) {
+            Ok(Some(statuses[status_name].clone()))
         } else {
             Ok(None)
         }
     }
 
-    fn _store_message(
+    fn _store_status(
         &mut self,
-        message_name: &str,
-        messages: HashMap<String, Message>,
+        status_name: &str,
+        statuses: HashMap<String, Status>,
     ) -> Result<(), ApplyError> {
-        let address = MessageState::calculate_address(message_name);
-        let state_string = Message::serialize_messages(messages);
+        let address = StatusState::calculate_address(status_name);
+        let state_string = Status::serialize_statuses(statuses);
         self.address_map
             .insert(address.clone(), Some(state_string.clone()));
         self.context
@@ -97,8 +97,8 @@ impl<'a> MessageState<'a> {
         Ok(())
     }
 
-    fn _delete_message(&mut self, message_name: &str) -> Result<(), ApplyError> {
-        let address = MessageState::calculate_address(message_name);
+    fn _delete_status(&mut self, status_name: &str) -> Result<(), ApplyError> {
+        let address = StatusState::calculate_address(status_name);
         if self.address_map.contains_key(&address) {
             self.address_map.insert(address.clone(), None);
         }
@@ -106,13 +106,13 @@ impl<'a> MessageState<'a> {
         Ok(())
     }
 
-    fn _load_messages(&mut self, message_name: &str) -> Result<HashMap<String, Message>, ApplyError> {
-        let address = MessageState::calculate_address(message_name);
+    fn _load_statuses(&mut self, status_name: &str) -> Result<HashMap<String, Status>, ApplyError> {
+        let address = StatusState::calculate_address(status_name);
 
         Ok(match self.address_map.entry(address.clone()) {
             Entry::Occupied(entry) => match entry.get() {
-                Some(addr) => Message::deserialize_messages(addr).ok_or_else(|| {
-                    ApplyError::InvalidTransaction("Invalid serialization of message state".into())
+                Some(addr) => Status::deserialize_statuses(addr).ok_or_else(|| {
+                    ApplyError::InvalidTransaction("Invalid serialization of status state".into())
                 })?,
                 None => HashMap::new(),
             },
@@ -120,14 +120,14 @@ impl<'a> MessageState<'a> {
                 Some(state_bytes) => {
                     let state_string = from_utf8(&state_bytes).map_err(|e| {
                         ApplyError::InvalidTransaction(format!(
-                            "Invalid serialization of message state: {}",
+                            "Invalid serialization of status state: {}",
                             e
                         ))
                     })?;
 
                     entry.insert(Some(state_string.to_string()));
 
-                    Message::deserialize_messages(state_string).ok_or_else(|| {
+                    Status::deserialize_statuses(state_string).ok_or_else(|| {
                         ApplyError::InvalidTransaction("Invalid serialization of message state".into())
                     })?
                 }

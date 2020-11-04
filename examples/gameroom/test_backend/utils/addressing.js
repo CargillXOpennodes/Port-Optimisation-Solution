@@ -14,7 +14,7 @@
 const crypto = require('crypto');
 export const MESSAGE_NAME = "sawtooth_message";
 export const MESSAGE_VERSION = "1.0";
-export const MESSAGE_PREFIX = "f8daf5";
+export const MESSAGE_PREFIX = "b01374";
 // The namespace registry prefix for global state (00ec00)
 const NAMESPACE_REGISTRY_PREFIX = '00ec00';
 // The contract prefix for global state (00ec02)

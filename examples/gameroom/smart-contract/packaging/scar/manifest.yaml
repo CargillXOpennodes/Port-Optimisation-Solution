@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: sawtooth_xo
+name: sawtooth_message
 version: '1.0'
 inputs:
-  - '5b7349'
+  - 'b01374'
 outputs:
-  - '5b7349'
+  - 'b01374'
