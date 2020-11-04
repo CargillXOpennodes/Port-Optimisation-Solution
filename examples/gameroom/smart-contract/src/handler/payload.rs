@@ -23,15 +23,15 @@ cfg_if! {
     }
 }
 
-pub struct MessagePayload {
+pub struct StatusPayload {
     name: String,
     action: String,
-    message_content: String,
+    status_string: String,
 }
 
-impl MessagePayload {
+impl StatusPayload {
     // payload_data is a utf-8 encoded string
-    pub fn new(payload_data: &[u8]) -> Result<MessagePayload, ApplyError> {
+    pub fn new(payload_data: &[u8]) -> Result<StatusPayload, ApplyError> {
         let payload_string = match ::std::str::from_utf8(&payload_data) {
             Ok(s) => s,
             Err(_) => {
@@ -43,13 +43,18 @@ impl MessagePayload {
 
         let items: Vec<&str> = payload_string.split(',').collect();
 
-        if items.len() != 3 {
+        if items.len() != 13 {
             return Err(ApplyError::InvalidTransaction(String::from(
-                "Payload must have exactly 2 commas",
+                "Payload must have exactly 12 commas",
             )));
         }
 
-        let (name, action, message_content) = (items[0], items[1], items[2]);
+        let (name, action) = (items[0], items[1]);
+        
+        let mut status_string = items[2].to_string().clone();
+        for i in 3..13 {
+            status_string = status_string + "," + items[i];
+        }
 
         if name.is_empty() {
             return Err(ApplyError::InvalidTransaction(String::from(
@@ -69,7 +74,7 @@ impl MessagePayload {
             )));
         }
         match action {
-            "create" | "add" | "delete" => (),
+            "create" | "delay" | "prepone" | "delete" => (),
             _ => {
                 return Err(ApplyError::InvalidTransaction(String::from(
                     format!("Invalid action: {}", action).as_str(),
@@ -77,32 +82,10 @@ impl MessagePayload {
             }
         };
 
-        // let mut space_parsed: usize = 0; // Default, invalid value
-        // if action == "take" {
-        //     if space.is_empty() {
-        //         return Err(ApplyError::InvalidTransaction(String::from(
-        //             "Space is required with action `take`",
-        //         )));
-        //     }
-        //     space_parsed = match space.parse() {
-        //         Ok(num) => num,
-        //         Err(_) => {
-        //             return Err(ApplyError::InvalidTransaction(String::from(
-        //                 "Space must be an integer",
-        //             )));
-        //         }
-        //     };
-        //     if space_parsed < 1 || space_parsed > 9 {
-        //         return Err(ApplyError::InvalidTransaction(String::from(
-        //             "Space must be an integer from 1 to 9",
-        //         )));
-        //     }
-        // }
-
-        Ok(MessagePayload {
+        Ok(StatusPayload {
             name: name.to_string(),
             action: action.to_string(),
-            message_content: message_content.to_string(),
+            status_string: status_string.to_string()
         })
     }
 
@@ -112,9 +95,10 @@ impl MessagePayload {
 
     pub fn get_action(&self) -> String {
         self.action.clone()
+    }    
+    
+    pub fn get_status_string(&self) -> String {
+        self.status_string.clone()
     }
 
-    pub fn get_message_content(&self) -> String {
-        self.message_content.clone()
-    }
 }

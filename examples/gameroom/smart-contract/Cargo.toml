@@ -15,7 +15,7 @@
 
 [package]
 name = "sawtooth-message-tp-rust"
-version = "0.1.0"
+version = "0.1.2"
 authors = ["Bitwise IO, Inc.", "CargillXOpenNodes"]
 edition = "2018"
 license = "Apache-2.0"

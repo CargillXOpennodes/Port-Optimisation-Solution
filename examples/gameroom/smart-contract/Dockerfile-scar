@@ -86,4 +86,4 @@ RUN cp target/wasm32-unknown-unknown/release/message-tp-rust.wasm \
 WORKDIR /build/contracts/message_rust/packaging/scar
 
 # Create .scar file
-RUN tar -jcvf /build/contracts/message_0.1.0.scar .
+RUN tar -jcvf /build/contracts/message_0.1.1.scar .

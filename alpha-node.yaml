@@ -18,7 +18,7 @@
          splinterd -v \
              --node-id alpha \
              --network-endpoints tcps://0.0.0.0:8044 \
-             --advertised-endpoints tcps://splinterd-alpha:8044 \
+             --advertised-endpoints tcps://splinter`d-alpha:8044 \
              --rest-api-endpoint 0.0.0.0:8085 \
              --registries file:///config/alpha-registry.yaml \
              --tls-insecure

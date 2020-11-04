@@ -33,7 +33,7 @@ cfg_if! {
         use log4rs::encode::pattern::PatternEncoder;
 
         use sawtooth_sdk::processor::TransactionProcessor;
-        use sawtooth_message::handler::MessageTransactionHandler;
+        use sawtooth_message::handler::StatusTransactionHandler;
     } else {
         use sawtooth_message::handler::apply;
         use sabre_sdk::{WasmPtr, execute_entrypoint};
@@ -44,7 +44,7 @@ cfg_if! {
 fn main() {
     let matches = clap_app!(xo =>
         (version: crate_version!())
-        (about: "Message Transaction Processor (Rust)")
+        (about: "Ship Status Transaction Processor (Rust)")
         (@arg connect: -C --connect +takes_value
          "connection endpoint for validator")
         (@arg verbose: -v --verbose +multiple
@@ -90,7 +90,7 @@ fn main() {
         }
     }
 
-    let handler = MessageTransactionHandler::new();
+    let handler = StatusTransactionHandler::new();
     let mut processor = TransactionProcessor::new(endpoint);
 
     info!("Console logging level: {}", console_log_level);

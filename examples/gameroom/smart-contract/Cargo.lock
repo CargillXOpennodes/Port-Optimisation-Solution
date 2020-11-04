@@ -645,6 +645,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "sawtooth-message-tp-rust"
+version = "0.1.2"
+dependencies = [
+ "cfg-if 0.1.10",
+ "clap",
+ "log 0.4.11",
+ "log4rs",
+ "rust-crypto",
+ "rust-crypto-wasm",
+ "sabre-sdk",
+ "sawtooth-sdk",
+]
+
+[[package]]
 name = "sawtooth-sdk"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -663,20 +677,6 @@ dependencies = [
  "sawtooth-zmq",
  "secp256k1",
  "uuid",
-]
-
-[[package]]
-name = "sawtooth-xo-tp-rust"
-version = "0.5.1"
-dependencies = [
- "cfg-if 0.1.10",
- "clap",
- "log 0.4.11",
- "log4rs",
- "rust-crypto",
- "rust-crypto-wasm",
- "sabre-sdk",
- "sawtooth-sdk",
 ]
 
 [[package]]

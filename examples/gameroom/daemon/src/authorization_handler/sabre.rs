@@ -47,7 +47,7 @@ use super::AppAuthHandlerError;
 
 const MESSAGE_NAME: &str = "sawtooth_message";
 const MESSAGE_VERSION: &str = "1.0";
-pub const MESSAGE_PREFIX: &str = "f8daf5";
+pub const MESSAGE_PREFIX: &str = "b01374";
 
 const MESSAGE_CONTRACT_PATH: &str = "/var/lib/gameroomd/message-tp-rust.wasm";
 

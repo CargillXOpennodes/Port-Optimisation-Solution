@@ -30,3 +30,12 @@
     - "bob.pub"
   metadata:
     organization: "Bubba Bakery"
+
+- identity: "delta"
+  endpoints:
+    - "tcps://delta.default.svc.cluster.local:8044"
+  display_name: "Delta Drugs"
+  keys:
+    - "dan.pub"
+  metadata:
+    organization: "Delta Drugs"

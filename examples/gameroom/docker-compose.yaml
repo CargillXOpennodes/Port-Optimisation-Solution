@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version: "3.7"
+version: "3.8"
 
 networks:
   gameroom:
@@ -26,8 +26,11 @@ volumes:
   registry:
   acme-var:
   bubba-var:
+  delta-var:
   acme-db:
   bubba-db:
+  delta-db:
+  
 
 services:
 
@@ -51,6 +54,7 @@ services:
               # generate keys
               splinter admin keygen alice -d /registry
               splinter admin keygen bob -d /registry
+              splinter admin keygen dan -d /registry
               # check if splinterd-node-acme is available
               while [[ $$(curl --write-out %{http_code} --silent --output /dev/null http://splinterd-node-acme:8085/status) -ne 200 ]] ; do
                  >&2 echo \"splinterd is unavailable - sleeping\"
@@ -58,6 +62,11 @@ services:
               done
               # check if splinterd-node-bubba is available
               while [[ $$(curl --write-out %{http_code} --silent --output /dev/null http://splinterd-node-bubba:8085/status) -ne 200 ]] ; do
+                 >&2 echo \"splinterd is unavailable - sleeping\"
+                 sleep 1
+              done              
+              # check if splinterd-node-delta is available
+              while [[ $$(curl --write-out %{http_code} --silent --output /dev/null http://splinterd-node-delta:8085/status) -ne 200 ]] ; do
                  >&2 echo \"splinterd is unavailable - sleeping\"
                  sleep 1
               done
@@ -72,6 +81,11 @@ services:
                 --file /registry/registry.yaml \
                 --key-file /registry/bob.pub \
                 --metadata organization='Bubba Bakery'
+              splinter registry build \
+                http://splinterd-node-delta:8085 \
+                --file /registry/registry.yaml \
+                --key-file /registry/dan.pub \
+                --metadata organization='Delta Drugs'
             fi
           "
 
@@ -360,6 +374,145 @@ services:
       networks:
         gameroom:
           ipv4_address: 172.28.3.5
+      environment:
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: admin
+        POSTGRES_DB: splinter
+
+    db-delta:
+      image: gameroom-database
+      container_name: db-delta
+      build:
+        context: ../..
+        dockerfile: ./examples/gameroom/database/Dockerfile-installed
+        args:
+          - REPO_VERSION=${REPO_VERSION}
+      restart: always
+      networks:
+        gameroom:
+          ipv4_address: 172.28.4.1
+      volumes:
+        - delta-db:/var/lib/postgresql/data
+      expose:
+        - 5432
+      ports:
+          - "5436:5432"
+      environment:
+        POSTGRES_USER: gameroom
+        POSTGRES_PASSWORD: gameroom_example
+        POSTGRES_DB: gameroom
+
+    # change this later to delta
+    # gameroom-app-bubba:
+    #   build:
+    #     context: ../..
+    #     dockerfile: ./examples/gameroom/gameroom-app/Dockerfile-installed
+    #     args:
+    #       VUE_APP_BRAND: "bubba"
+    #       REPO_VERSION: ${REPO_VERSION}
+    #   image: gameroom-app-bubba
+    #   container_name: gameroom-app-bubba
+    #   networks:
+    #     gameroom:
+    #       ipv4_address: 172.28.3.2
+    #   environment:
+    #     - VUE_APP_BRAND=bubba
+    #   expose:
+    #     - 80
+    #   ports:
+    #     - '8081:80'
+
+    gameroomd-delta:
+        image: gameroomd
+        container_name: gameroomd-delta
+        build:
+          context: ../..
+          dockerfile: ./examples/gameroom/daemon/Dockerfile-installed-${DISTRO}
+          args:
+            - CARGO_ARGS=${CARGO_ARGS}
+            - REPO_VERSION=${REPO_VERSION}
+        networks:
+          gameroom:
+            ipv4_address: 172.28.4.3
+        volumes:
+          - cargo-registry:/root/.cargo/registry
+        expose:
+          - 8000
+        ports:
+          - "8002:8000"
+        depends_on:
+          - splinterd-node-delta
+        command: |
+          bash -c "
+            # we need to wait for the db to have started.
+            until PGPASSWORD=gameroom_example psql -h db-delta -U gameroom -c '\q'; do
+                >&2 echo \"Database is unavailable - sleeping\"
+                sleep 1
+            done
+
+            # check if splinterd-node-delta is available
+            while [[ $$(curl --write-out %{http_code} --silent --output /dev/null http://splinterd-node-delta:8085/status) -ne 200 ]] ; do
+               >&2 echo \"splinterd is unavailable - sleeping\"
+               sleep 1
+            done
+
+            gameroom -vv database migrate --database-url postgres://gameroom:gameroom_example@db-delta:5432/gameroom
+            gameroomd -vv --database-url postgres://gameroom:gameroom_example@db-delta:5432/gameroom \
+              -b gameroomd-delta:8000 --splinterd-url http://splinterd-node-delta:8085
+          "
+
+    splinterd-node-delta:
+      image: splinterd-node
+      container_name: splinterd-node-delta
+      build:
+        context: ../..
+        dockerfile: splinterd/Dockerfile-installed-${DISTRO}
+        args:
+          - CARGO_ARGS=${CARGO_ARGS}
+          - REPO_VERSION=${REPO_VERSION}
+      expose:
+        - 8080
+        - 8044
+        - 8945
+        - 8085
+      ports:
+        - 8090:8085
+      networks:
+        gameroom:
+          ipv4_address: 172.28.4.4
+      volumes:
+        - ./splinterd-config:/configs
+        - delta-var:/var/lib/splinter
+      entrypoint: |
+        bash -c "
+          until PGPASSWORD=admin psql -h splinterd-db-delta -U admin -d splinter -c '\q'; do
+            >&2 echo \"Database is unavailable - sleeping\"
+            sleep 1
+          done && \
+          splinter database migrate -C postgres://admin:admin@splinterd-db-delta:5432/splinter && \
+          mkdir -p /etc/splinter/certs && \
+          splinter cert generate --skip && \
+          splinterd -c ./configs/splinterd-node-delta.toml -vv \
+              --database postgres://admin:admin@splinterd-db-delta:5432/splinter \
+              --network-endpoints tcps://0.0.0.0:8044 \
+              --advertised-endpoints tcps://splinterd-node-delta:8044 \
+              --rest-api-endpoint 0.0.0.0:8085 \
+              --registries http://registry-server:80/registry.yaml \
+              --tls-insecure \
+              --enable-biome
+        "
+
+    splinterd-db-delta:
+      image: postgres
+      container_name: splinterd-db-delta
+      restart: always
+      expose:
+        - 5432
+      ports:
+        - "5437:5432"
+      networks:
+        gameroom:
+          ipv4_address: 172.28.4.5
       environment:
         POSTGRES_USER: admin
         POSTGRES_PASSWORD: admin
