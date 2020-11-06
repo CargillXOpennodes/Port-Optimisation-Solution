@@ -402,26 +402,6 @@ services:
         POSTGRES_PASSWORD: gameroom_example
         POSTGRES_DB: gameroom
 
-    # change this later to delta
-    # gameroom-app-bubba:
-    #   build:
-    #     context: ../..
-    #     dockerfile: ./examples/gameroom/gameroom-app/Dockerfile-installed
-    #     args:
-    #       VUE_APP_BRAND: "bubba"
-    #       REPO_VERSION: ${REPO_VERSION}
-    #   image: gameroom-app-bubba
-    #   container_name: gameroom-app-bubba
-    #   networks:
-    #     gameroom:
-    #       ipv4_address: 172.28.3.2
-    #   environment:
-    #     - VUE_APP_BRAND=bubba
-    #   expose:
-    #     - 80
-    #   ports:
-    #     - '8081:80'
-
     gameroomd-delta:
         image: gameroomd
         container_name: gameroomd-delta
