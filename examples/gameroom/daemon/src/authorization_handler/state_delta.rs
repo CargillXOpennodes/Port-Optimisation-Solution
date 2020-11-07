@@ -196,19 +196,66 @@ impl StatusStateDeltaProcessor {
                             )?;
                         }
                         None => {
-                            m = Message {
-                                message_name: message_state[0].to_string(),
-                                message_content: message_state[1].to_string(),
-                                message_type: MessageType::TEXT.to_string(),
-                                id: message_state[3].parse::<i32>().unwrap(),
-                                previous_id: None,
-                                sender: message_state[5].to_string(),
-                                participant_1: message_state[5].to_string(),
-                                participant_2: message_state[6].to_string(),
-                                created_time: time.clone(),
-                                circuit_id: self.circuit_id.clone(),
-                                updated_time: time.clone(),
+                            m = Status {
+                                id: 0,
+                                status_name,
+                                circuit_id: "".to_string(),
+                                sender: status_state[1].to_string().clone(),
+                                participant_1: "".to_string(),
+                                participant_2: status_state[3].to_string().clone(),
+                                eta: None,
+                                etb: None,
+                                ata: None,
+                                eto: None,
+                                ato: None,
+                                etc: None,
+                                etd: None,
+                                is_bunkering: None,
+                                bunkering_time: None,
+                                logs: status_state[14].to_string().clone(),
+                                created_time: time,
+                                updated_time: time
                             };
+                            let epoch = time.checked_sub(time.duration_since(UNIX_EPOCH).into_ok());
+                            m.is_bunkering = match status_state[12].to_string() {
+                                String::from("true") => Some(true),
+                                String::from("false") => Some(false),
+                                _ => None
+                            };
+                            if let Some(epoch_time) = epoch {
+                                if let Ok(n) = status_state[5].parse::<u64>() {
+                                    let eta = epoch_time.checked_add(Duration::from_millis(n));
+                                    m.eta = eta;
+                                }
+                                if let Ok(n) = status_state[6].parse::<u64>() {
+                                    let etb = epoch_time.checked_add(Duration::from_millis(n));
+                                    m.etb = etb;
+                                }
+                                if let Ok(n) = status_state[7].parse::<u64>() {
+                                    let ata = epoch_time.checked_add(Duration::from_millis(n));
+                                    m.ata = ata;
+                                }
+                                if let Ok(n) = status_state[8].parse::<u64>() {
+                                    let eto = epoch_time.checked_add(Duration::from_millis(n));
+                                    m.eto = eto;
+                                }
+                                if let Ok(n) = status_state[9].parse::<u64>() {
+                                    let ato = epoch_time.checked_add(Duration::from_millis(n));
+                                    m.ato = ato;
+                                }
+                                if let Ok(n) = status_state[10].parse::<u64>() {
+                                    let etc = epoch_time.checked_add(Duration::from_millis(n));
+                                    m.etc = etc;
+                                }
+                                if let Ok(n) = status_state[11].parse::<u64>() {
+                                    let etd = epoch_time.checked_add(Duration::from_millis(n));
+                                    m.etd = etd;
+                                }
+                                if let Ok(n) = status_state[13].parse::<u64>() {
+                                    let bunkering_time = epoch_time.checked_add(Duration::from_millis(n));
+                                    m.bunkering_time = bunkering_time;
+                                }
+                            }
 
                             notification = helpers::create_new_notification(
                                 &format!("message_updated:{}", message_state[0]),
