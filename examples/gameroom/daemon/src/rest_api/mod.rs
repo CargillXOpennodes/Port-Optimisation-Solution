@@ -157,20 +157,16 @@ pub fn run(
                         web::resource("/subscribe").route(web::get().to(routes::connect_socket)),
                     )
                     .service(
-                        web::scope("/message/{circuit_id}").service(
-                            web::scope("/messages")
-                            //     .service(
-                            //         web::resource("/{game_id}")
-                            //             .route(web::get().to(routes::fetch_xo)),
-                            //     )
-                                .service(web::resource("").route(web::get().to(routes::list_messages))),
+                        web::scope("/status/{circuit_id}").service(
+                            web::scope("/statuses")
+                                .service(
+                                    web::resource("/{status_id}")
+                                        .route(web::get().to(routes::fetch_status)),
+                                )
+                                .service(web::resource("").route(web::get().to(routes::list_statuses)),
                         ),
                     )
-                    .service(
-                        web::resource("/statusupload")
-                        .route()
-
-                    )
+                )
             })
             .bind(bind_url)?
             .disable_signals()

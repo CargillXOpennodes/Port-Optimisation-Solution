@@ -112,6 +112,45 @@ impl From<Status> for ApiStatus {
     }
 }
 
+pub async fn fetch_xo(
+    pool: web::Data<ConnectionPool>,
+    circuit_id: web::Path<String>,
+    game_name: web::Path<String>,
+) -> Result<HttpResponse, Error> {
+    match web::block(move || fetch_xo_game_from_db(pool, &circuit_id, &game_name)).await {
+        Ok(xo_game) => Ok(HttpResponse::Ok().json(SuccessResponse::new(xo_game))),
+        Err(err) => {
+            match err {
+                error::BlockingError::Error(err) => match err {
+                    RestApiResponseError::NotFound(err) => {
+                        Ok(HttpResponse::NotFound().json(ErrorResponse::not_found(&err)))
+                    }
+                    _ => Ok(HttpResponse::BadRequest()
+                        .json(ErrorResponse::bad_request(&err.to_string()))),
+                },
+                error::BlockingError::Canceled => {
+                    debug!("Internal Server Error: {}", err);
+                    Ok(HttpResponse::InternalServerError().json(ErrorResponse::internal_error()))
+                }
+            }
+        }
+    }
+}
+
+fn fetch_xo_game_from_db(
+    pool: web::Data<ConnectionPool>,
+    circuit_id: &str,
+    game_name: &str,
+) -> Result<ApiXoGame, RestApiResponseError> {
+    if let Some(xo_game) = helpers::fetch_xo_game(&*pool.get()?, circuit_id, game_name)? {
+        return Ok(ApiXoGame::from(xo_game));
+    }
+    Err(RestApiResponseError::NotFound(format!(
+        "XO Game with name {} not found",
+        game_name
+    )))
+}
+
 pub async fn list_statuses(
     statuses: HashMap<String, Status>
 ) -> String {
