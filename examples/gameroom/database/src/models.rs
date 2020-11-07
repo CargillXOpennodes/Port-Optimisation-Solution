@@ -16,7 +16,7 @@
  */
 
 use super::schema::*;
-use std::time::SystemTime;
+use std::time::{SystemTime, Duration};
 
 #[derive(Insertable, Queryable, Identifiable, PartialEq, Debug)]
 #[table_name = "gameroom"]
@@ -178,14 +178,14 @@ pub struct NewGameroomNotification {
 // }
 
 
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Queryable, Identifiable, Associations, Insertable, AsChangeset)]
+#[table_name = "statuses"]
 pub struct Status {
-    name: String,
+    id: i32,
+    status_name: String,
     sender: String,
     participant1: String,
     participant2: String,
-    participant1_short: String,
-    participant2_short: String,
     docking_type: DockingType,
     eta: Option<Duration>,
     etb: Option<Duration>,
