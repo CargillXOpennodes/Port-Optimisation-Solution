@@ -106,6 +106,12 @@ pub async fn propose_gameroom(
 
     let response = fetch_node_information(&create_gameroom.members, &splinterd_url, client).await;
 
+    let gamerooms = helpers::list_gamerooms_with_paging(&*pool.get()?, 10, 10);
+    gamerooms
+        .and_then(|gameroomsVEC|{
+            gameroomsVEC.into_iter()
+                .map()
+        });
     let nodes = match response {
         Ok(nodes) => nodes,
         Err(err) => match err {

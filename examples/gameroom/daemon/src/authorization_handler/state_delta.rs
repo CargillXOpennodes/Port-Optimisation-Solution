@@ -36,7 +36,7 @@ pub struct MessageStateDeltaProcessor {
     db_pool: ConnectionPool,
 }
 
-impl MessageStateDeltaProcessor {
+impl StatusStateDeltaProcessor {
     pub fn new(
         circuit_id: &str,
         node_id: &str,

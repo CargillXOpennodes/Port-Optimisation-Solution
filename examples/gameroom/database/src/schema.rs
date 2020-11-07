@@ -95,13 +95,18 @@ table! {
 }
 
 table! {
-    messages (id) {
+    statuses (id) {
         id -> Integer,
         circuit_id -> Text,
-        message_name -> Text,
-        message_content -> Text,
-        message_type -> Text,
-        previous_id -> Nullable<Integer>,
+        eta -> Nullable<BigInt>,
+        etb -> Nullable<BigInt>,
+        ata -> Nullable<BigInt>,
+        eto -> Nullable<BigInt>,
+        ato -> Nullable<BigInt>,
+        etc -> Nullable<BigInt>,
+        etd -> Nullable<BigInt>,
+        status_name -> Text,
+        docking_type -> Text,
         sender -> Text,
         participant_1 -> Text,
         participant_2 -> Text,
