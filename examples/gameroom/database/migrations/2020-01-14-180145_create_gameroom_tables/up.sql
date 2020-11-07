@@ -106,3 +106,29 @@ CREATE TABLE IF NOT EXISTS statuses (
   updated_time              TIMESTAMP   NOT NULL,
   FOREIGN KEY (circuit_id) REFERENCES gameroom(circuit_id) ON DELETE CASCADE
 );
+
+
+CREATE TABLE IF NOT EXISTS statuses (
+  id                        BIGSERIAL   PRIMARY KEY,
+  circuit_id                TEXT        NOT NULL,
+  proposal_id               BIGSERIAL   NOT NULL,
+  status_name               TEXT        NOT NULL,
+  sender                    TEXT        NOT NULL,
+  participant1              TEXT        NOT NULL,
+  participant2              TEXT        NOT NULL,
+  participant1_short        TEXT        NOT NULL,
+  participant2_short        TEXT        NOT NULL,
+  eta                       TIMESTAMP,
+  etb                       TIMESTAMP,
+  ata                       TIMESTAMP,
+  eto                       TIMESTAMP,
+  ato                       TIMESTAMP,
+  etc                       TIMESTAMP,
+  etd                       TIMESTAMP,
+  is_bunkering              BOOLEAN     NOT NULL,
+  bunkering_time            TIMESTAMP   NOT NULL,
+  created_time              TIMESTAMP   NOT NULL,
+  updated_time              TIMESTAMP   NOT NULL,
+  FOREIGN KEY (circuit_id) REFERENCES gameroom(circuit_id) ON DELETE CASCADE
+  FOREIGN KEY (proposal_id) REFERENCES gameroom_proposal(id) ON DELETE CASCADE
+);
