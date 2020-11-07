@@ -45,14 +45,14 @@ use transact::{
 
 use super::AppAuthHandlerError;
 
-const MESSAGE_NAME: &str = "sawtooth_message";
-const MESSAGE_VERSION: &str = "1.0";
-pub const MESSAGE_PREFIX: &str = "b01374";
+const STATUS_NAME: &str = "sawtooth_message";
+const STATUS_VERSION: &str = "1.0";
+pub const STATUS_PREFIX: &str = "b01374";
 
-const MESSAGE_CONTRACT_PATH: &str = "/var/lib/gameroomd/message-tp-rust.wasm";
+const STATUS_CONTRACT_PATH: &str = "/var/lib/gameroomd/message-tp-rust.wasm";
 
 /// Create and submit the Sabre transactions to setup the message smart contract.
-pub fn setup_message(
+pub fn setup_status(
     private_key: &str,
     scabbard_admin_keys: Vec<String>,
     splinterd_url: &str,
@@ -166,8 +166,8 @@ fn upload_contract_txn(signer: &dyn Signer) -> Result<Transaction, AppAuthHandle
     let action_addresses = vec![MESSAGE_PREFIX.to_string()];
 
     Ok(CreateContractActionBuilder::new()
-        .with_name(MESSAGE_NAME.into())
-        .with_version(MESSAGE_VERSION.into())
+        .with_name(STATUS_NAME.into())
+        .with_version(STATUS_VERSION.into())
         .with_inputs(action_addresses.clone())
         .with_outputs(action_addresses)
         .with_contract(contract)
@@ -181,7 +181,7 @@ fn create_message_namespace_registry_txn(
     signer: &dyn Signer,
 ) -> Result<Transaction, AppAuthHandlerError> {
     Ok(CreateNamespaceRegistryActionBuilder::new()
-        .with_namespace(MESSAGE_PREFIX.into())
+        .with_namespace(STATUS_PREFIX.into())
         .with_owners(owners)
         .into_payload_builder()?
         .into_transaction_builder(signer)?
@@ -190,8 +190,8 @@ fn create_message_namespace_registry_txn(
 
 fn message_namespace_permissions_txn(signer: &dyn Signer) -> Result<Transaction, AppAuthHandlerError> {
     Ok(CreateNamespaceRegistryPermissionActionBuilder::new()
-        .with_namespace(MESSAGE_PREFIX.into())
-        .with_contract_name(MESSAGE_NAME.into())
+        .with_namespace(STATUS_PREFIX.into())
+        .with_contract_name(STATUS_NAME.into())
         .with_read(true)
         .with_write(true)
         .into_payload_builder()?
@@ -201,7 +201,7 @@ fn message_namespace_permissions_txn(signer: &dyn Signer) -> Result<Transaction,
 
 pub fn get_message_contract_address() -> Result<String, AppAuthHandlerError> {
     Ok(bytes_to_hex_str(&compute_contract_address(
-        MESSAGE_NAME, MESSAGE_VERSION,
+        STATUS_NAME, STATUS_VERSION,
     )?))
 }
 
