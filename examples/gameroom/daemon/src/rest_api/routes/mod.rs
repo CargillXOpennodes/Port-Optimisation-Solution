@@ -19,7 +19,7 @@ mod node;
 mod notification;
 mod proposal;
 mod submit;
-mod message;
+mod status;
 
 pub use authenticate::*;
 pub use gameroom::*;
@@ -28,7 +28,7 @@ pub use node::*;
 pub use notification::*;
 pub use proposal::*;
 pub use submit::*;
-pub use message::*;
+pub use status::*;
 
 use percent_encoding::{AsciiSet, CONTROLS};
 use serde::{Deserialize, Serialize};

@@ -24,6 +24,7 @@ use super::{
     get_response_paging_info, validate_limit, ErrorResponse, SuccessResponse, DEFAULT_LIMIT,
     DEFAULT_OFFSET,
 };
+use gameroom_database::schema::gameroom::columns::status;
 
 
 // pub struct ApiMessage {
@@ -90,35 +91,36 @@ pub struct ApiStatus {
 impl From<Status> for ApiStatus {
     fn from(sta: Status) -> Status {
         Status {
-            name: name,
+            id: sta.id,
+            circuit_id: sta.circuit_id,
+            status_name: name,
             sender: sta.sender,
-            participant1: sta.participant1
-            participant2: sta.partcipant2
-            participant1_short: sta.participant1_short
-            participant2_short: sta.participant2_short
-            docking_type: sta.docking_type.DockingType(),
+            participant_1: sta.participant1,
+            participant_2: sta.partcipant2,
             eta: sta.eta,
             etb: sta.etb,
             ata: sta.ata,
             eto: sta.eto,
             ato: sta.ato,
             etc: sta.etc,
-            etd: sta.etd
-            is_bunkering: sta.is_bunkering
-            bunkering_time: sta.bunkering_time
-            logs: sta.logs
+            etd: sta.etd,
+            is_bunkering: sta.is_bunkering,
+            bunkering_time: sta.bunkering_time,
+            logs: sta.logs,
+            created_time: sta.created_time,
+            updated_time: sta.updated_time
 
         }
     }
 }
 
-pub async fn fetch_xo(
+pub async fn fetch_status(
     pool: web::Data<ConnectionPool>,
     circuit_id: web::Path<String>,
     game_name: web::Path<String>,
 ) -> Result<HttpResponse, Error> {
-    match web::block(move || fetch_xo_game_from_db(pool, &circuit_id, &game_name)).await {
-        Ok(xo_game) => Ok(HttpResponse::Ok().json(SuccessResponse::new(xo_game))),
+    match web::block(move || fetch_status_db(pool, &circuit_id, &game_name)).await {
+        Ok(status) => Ok(HttpResponse::Ok().json(SuccessResponse::new(status))),
         Err(err) => {
             match err {
                 error::BlockingError::Error(err) => match err {
@@ -137,29 +139,35 @@ pub async fn fetch_xo(
     }
 }
 
-fn fetch_xo_game_from_db(
+fn fetch_status_from_db(
     pool: web::Data<ConnectionPool>,
     circuit_id: &str,
     game_name: &str,
-) -> Result<ApiXoGame, RestApiResponseError> {
-    if let Some(xo_game) = helpers::fetch_xo_game(&*pool.get()?, circuit_id, game_name)? {
-        return Ok(ApiXoGame::from(xo_game));
+) -> Result<ApiStatus, RestApiResponseError> {
+    if let Some(status) = helpers::fetch_status(&*pool.get()?, circuit_id, game_name)? {
+        return Ok(ApiStatus::from(status));
     }
     Err(RestApiResponseError::NotFound(format!(
-        "XO Game with name {} not found",
+        "Status with name {} not found",
         game_name
     )))
 }
 
 pub async fn list_statuses(
-    statuses: HashMap<String, Status>
-) -> String {
-    let mut status_strings: Vec<String> = vec![];
-    for (_, status) in statuses {
-        status_strings.push(status.to_string().clone());
-    }
-    status_strings.sort();
-    status_strings.join("|")
+    pool: web::Data<ConnectionPool>,
+    circuit_id: web::Path<String>,
+    query: web::Query<HashMap<String, usize>>,
+) -> Result<HttpResponse, Error> {
+    let offset: usize = query
+        .get("offset")
+        .map(ToOwned::to_owned)
+        .unwrap_or_else(|| DEFAULT_OFFSET);
+
+    let limit: usize = query
+        .get("limit")
+        .map(ToOwned::to_owned)
+        .unwrap_or_else(|| DEFAULT_LIMIT);
+    let base_link = format!("api/status/{}/statuses?", &circuit_id);
 
     match web::block(move || list_statuses_from_db(pool, &circuit_id.clone(), limit, offset)).await
     {
@@ -175,20 +183,21 @@ pub async fn list_statuses(
     }
 }
 
-
-
 fn list_statuses_from_db(
-    statuses: HashMap<String, Status>
+    pool: web::Data<ConnectionPool>,
+    circuit_id: &str,
     limit: usize,
     offset: usize,
 ) -> Result<(Vec<ApiStatus>, i64), RestApiResponseError> {
     let db_limit = validate_limit(limit);
     let db_offset = offset as i64;
 
-    let statuses = helpers::list_statuses(&*statuses.get()?, circuit_id, db_limit, db_offset)?
+    let status = helpers::list_statuses(&*pool.get()?, circuit_id, db_limit, db_offset)?
         .into_iter()
         .map(ApiStatus::from)
         .collect();
+    let status_count = helpers::get_status_count(&*pool.get()?)?;
 
-    Ok((statuses))
+    Ok((status, status_count))
 }
+
