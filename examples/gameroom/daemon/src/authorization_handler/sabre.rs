@@ -145,7 +145,7 @@ fn create_contract_registry_txn(
     signer: &dyn Signer,
 ) -> Result<Transaction, AppAuthHandlerError> {
     Ok(CreateContractRegistryActionBuilder::new()
-        .with_name(MESSAGE_NAME.into())
+        .with_name(STATUS_NAME.into())
         .with_owners(owners)
         .into_payload_builder()?
         .into_transaction_builder(signer)?
@@ -153,7 +153,7 @@ fn create_contract_registry_txn(
 }
 
 fn upload_contract_txn(signer: &dyn Signer) -> Result<Transaction, AppAuthHandlerError> {
-    let contract_path = Path::new(MESSAGE_CONTRACT_PATH);
+    let contract_path = Path::new(STATUS_CONTRACT_PATH);
     let contract_file = File::open(contract_path).map_err(|err| {
         AppAuthHandlerError::SabreError(format!("Failed to load contract: {}", err))
     })?;
@@ -163,7 +163,7 @@ fn upload_contract_txn(signer: &dyn Signer) -> Result<Transaction, AppAuthHandle
         AppAuthHandlerError::SabreError(format!("IoError while reading contract: {}", err))
     })?;
 
-    let action_addresses = vec![MESSAGE_PREFIX.to_string()];
+    let action_addresses = vec![STATUS_PREFIX.to_string()];
 
     Ok(CreateContractActionBuilder::new()
         .with_name(STATUS_NAME.into())
@@ -199,7 +199,7 @@ fn message_namespace_permissions_txn(signer: &dyn Signer) -> Result<Transaction,
         .build(signer)?)
 }
 
-pub fn get_message_contract_address() -> Result<String, AppAuthHandlerError> {
+pub fn get_status_contract_address() -> Result<String, AppAuthHandlerError> {
     Ok(bytes_to_hex_str(&compute_contract_address(
         STATUS_NAME, STATUS_VERSION,
     )?))
