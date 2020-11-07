@@ -14,7 +14,7 @@
 
 mod gameroom;
 mod notification;
-mod message;
+mod status;
 
 pub use gameroom::{
     fetch_active_gamerooms, fetch_gameroom, fetch_gameroom_by_alias,
@@ -32,6 +32,6 @@ pub use notification::{
     get_unread_notification_count, insert_gameroom_notification,
     list_unread_notifications_with_paging, update_gameroom_notification,
 };
-pub use message::{
-    get_latest_message_id, get_latest_message, list_messages, add_message, get_message_count,
+pub use status::{
+    list_statuses, fetch_status, insert_status, update_status, get_status_count,
 };
