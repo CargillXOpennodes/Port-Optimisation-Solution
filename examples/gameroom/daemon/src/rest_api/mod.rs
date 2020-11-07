@@ -166,6 +166,11 @@ pub fn run(
                                 .service(web::resource("").route(web::get().to(routes::list_messages))),
                         ),
                     )
+                    .service(
+                        web::resource("/statusupload")
+                        .route()
+
+                    )
             })
             .bind(bind_url)?
             .disable_signals()
