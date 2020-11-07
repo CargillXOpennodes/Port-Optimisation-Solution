@@ -64,3 +64,21 @@ impl ConnectionPool {
             .map_err(|err| DatabaseError::ConnectionError(Box::new(err)))
     }
 }
+
+
+impl FromSql<BigInt, Sqlite> for std::Duration {
+    fn from_sql(value: Option<&<Sqlite as Backend>::RawValue>) -> deserialize::Result<Self> {
+        let i64_value = <i64 as FromSql<BigInt, Sqlite>>::from_sql(value)?;
+        Ok(std::Duration::nanoseconds(i64_value))
+    }
+}
+
+impl ToSql<BigInt, Sqlite> for std::Duration {
+    fn to_sql<W: Write>(&self, out: &mut Output<W, Sqlite>) -> serialize::Result {
+        if let Some(num_nanoseconds) = self.num_nanoseconds() {
+            ToSql::<BigInt, Sqlite>::to_sql(&num_nanoseconds, out)
+        } else {
+            Err(format!("{:?} as nanoseconds is too larg to fit in an i64", self).into())
+        }
+    }
+}
