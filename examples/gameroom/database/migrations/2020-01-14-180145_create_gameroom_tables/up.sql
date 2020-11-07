@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS gameroom_notification (
   read                      BOOLEAN     NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS messages (
+CREATE TABLE IF NOT EXISTS statuses (
   id                        BIGSERIAL   PRIMARY KEY,
   circuit_id                TEXT        NOT NULL,
   message_name              TEXT        NOT NULL,

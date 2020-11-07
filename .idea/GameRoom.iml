@@ -2,7 +2,20 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/services/health/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libsplinter/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libsplinter/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/gameroom/daemon/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/gameroom/database/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/services/scabbard/libscabbard/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/cli/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/splinterd/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/services/scabbard/cli/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/gameroom/cli/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/client/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
