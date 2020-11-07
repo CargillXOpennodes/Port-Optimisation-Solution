@@ -116,11 +116,11 @@ pub async fn list_statuses(
     statuses: HashMap<String, Status>
 ) -> String {
     let mut status_strings: Vec<String> = vec![];
-        for (_, status) in statuses {
-            status_strings.push(status.to_string().clone());
-        }
-        status_strings.sort();
-        status_strings.join("|")
+    for (_, status) in statuses {
+        status_strings.push(status.to_string().clone());
+    }
+    status_strings.sort();
+    status_strings.join("|")
 
     match web::block(move || list_statuses_from_db(pool, &circuit_id.clone(), limit, offset)).await
     {

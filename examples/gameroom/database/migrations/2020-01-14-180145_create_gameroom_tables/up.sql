@@ -125,8 +125,8 @@ CREATE TABLE IF NOT EXISTS statuses (
   ato                       TIMESTAMP,
   etc                       TIMESTAMP,
   etd                       TIMESTAMP,
-  is_bunkering              BOOLEAN     NOT NULL,
-  bunkering_time            TIMESTAMP   NOT NULL,
+  is_bunkering              BOOLEAN,
+  bunkering_time            TIMESTAMP,
   created_time              TIMESTAMP   NOT NULL,
   updated_time              TIMESTAMP   NOT NULL,
   FOREIGN KEY (circuit_id) REFERENCES gameroom(circuit_id) ON DELETE CASCADE

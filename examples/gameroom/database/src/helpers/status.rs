@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use num_traits::cast::ToPrimitive;
 use crate::models::Status;
 use crate::schema::statuses;
 
