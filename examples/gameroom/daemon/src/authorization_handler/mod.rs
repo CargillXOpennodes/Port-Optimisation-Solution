@@ -41,11 +41,11 @@ use splinter::{
     events::{Igniter, ParseBytes, ParseError, WebSocketClient, WebSocketError, WsResponse},
     protocol::ADMIN_PROTOCOL_VERSION,
 };
-use state_delta::MessageStateDeltaProcessor;
+use state_delta::StatusStateDeltaProcessor;
 
 use crate::application_metadata::ApplicationMetadata;
 
-use self::sabre::setup_message;
+use self::sabre::setup_status;
 
 /// default value if the client should attempt to reconnect if ws connection is lost
 const RECONNECT: bool = true;
@@ -476,7 +476,7 @@ fn process_admin_event(
                 Ok(())
             })?;
 
-            let processor = MessageStateDeltaProcessor::new(
+            let processor = StatusStateDeltaProcessor::new(
                 &msg_proposal.circuit_id,
                 &proposal.requester_node_id,
                 &proposal.requester,
@@ -508,7 +508,7 @@ fn process_admin_event(
             let private_key_to_string = private_key.to_string();
             xo_ws.on_open(move |ctx| {
                 debug!("Starting XO State Delta Export");
-                let future = match setup_message(
+                let future = match setup_status(
                     &private_key_to_string,
                     scabbard_admin_keys.clone(),
                     &url_to_string,
@@ -548,7 +548,7 @@ fn resubscribe(
     gameroom: &ActiveGameroom,
     db_pool: &ConnectionPool,
 ) -> WebSocketClient<StateChangeEvent> {
-    let processor = MessageStateDeltaProcessor::new(
+    let processor = StatusStateDeltaProcessor::new(
         &gameroom.circuit_id,
         &gameroom.requester_node_id,
         &gameroom.requester,

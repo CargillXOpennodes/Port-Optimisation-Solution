@@ -13,9 +13,9 @@
 // limitations under the License.
 
 use std::collections::HashMap;
-use std::time::{Duration, SystemTime};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use actix_web::{web, Error, HttpResponse};
+use actix_web::{web, Error, error, HttpResponse};
 use gameroom_database::{helpers, models::Status, ConnectionPool};
 
 use crate::rest_api::RestApiResponseError;
@@ -24,8 +24,6 @@ use super::{
     get_response_paging_info, validate_limit, ErrorResponse, SuccessResponse, DEFAULT_LIMIT,
     DEFAULT_OFFSET,
 };
-use gameroom_database::schema::gameroom::columns::status;
-
 
 // pub struct ApiMessage {
 //     id : i32,
@@ -43,13 +41,12 @@ use gameroom_database::schema::gameroom::columns::status;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApiStatus {
+    id: i64,
+    circuit_id: String,
     name: String,
     sender: String,
     participant1: String,
     participant2: String,
-    participant1_short: String,
-    participant2_short: String,
-    docking_type: DockingType,
     eta: Option<Duration>,
     etb: Option<Duration>,
     ata: Option<Duration>,
@@ -60,6 +57,8 @@ pub struct ApiStatus {
     is_bunkering: Option<bool>,
     bunkering_time: Option<Duration>,
     logs: String,
+    created_time: SystemTime,
+    updated_time: SystemTime
 }
 
 // impl From<Message> for ApiMessage {
@@ -89,27 +88,42 @@ pub struct ApiStatus {
 // }
 
 impl From<Status> for ApiStatus {
-    fn from(sta: Status) -> Status {
-        Status {
+    fn from(sta: Status) -> ApiStatus {
+        ApiStatus {
             id: sta.id,
             circuit_id: sta.circuit_id,
-            status_name: name,
+            name: sta.status_name,
             sender: sta.sender,
-            participant_1: sta.participant1,
-            participant_2: sta.partcipant2,
-            eta: sta.eta,
-            etb: sta.etb,
-            ata: sta.ata,
-            eto: sta.eto,
-            ato: sta.ato,
-            etc: sta.etc,
-            etd: sta.etd,
+            participant1: sta.participant_1,
+            participant2: sta.participant_2,
+            eta: sta.eta
+                .map(|system_time| system_time
+                    .duration_since(UNIX_EPOCH).unwrap_or(Duration::from_nanos(0))),
+            etb: sta.etb
+                .map(|system_time| system_time
+                    .duration_since(UNIX_EPOCH).unwrap_or(Duration::from_nanos(0))),
+            ata: sta.ata
+                .map(|system_time| system_time
+                    .duration_since(UNIX_EPOCH).unwrap_or(Duration::from_nanos(0))),
+            eto: sta.eto
+                .map(|system_time| system_time
+                    .duration_since(UNIX_EPOCH).unwrap_or(Duration::from_nanos(0))),
+            ato: sta.ato
+                .map(|system_time| system_time
+                    .duration_since(UNIX_EPOCH).unwrap_or(Duration::from_nanos(0))),
+            etc: sta.etc
+                .map(|system_time| system_time
+                    .duration_since(UNIX_EPOCH).unwrap_or(Duration::from_nanos(0))),
+            etd: sta.etd
+                .map(|system_time| system_time
+                    .duration_since(UNIX_EPOCH).unwrap_or(Duration::from_nanos(0))),
             is_bunkering: sta.is_bunkering,
-            bunkering_time: sta.bunkering_time,
-            logs: sta.logs,
+            bunkering_time: sta.bunkering_time
+                .map(|system_time| system_time
+                    .duration_since(UNIX_EPOCH).unwrap_or(Duration::from_nanos(0))),
+            logs: sta.logs.to_string().clone(),
             created_time: sta.created_time,
             updated_time: sta.updated_time
-
         }
     }
 }
@@ -119,7 +133,7 @@ pub async fn fetch_status(
     circuit_id: web::Path<String>,
     game_name: web::Path<String>,
 ) -> Result<HttpResponse, Error> {
-    match web::block(move || fetch_status_db(pool, &circuit_id, &game_name)).await {
+    match web::block(move || fetch_status_from_db(pool, &circuit_id, &game_name)).await {
         Ok(status) => Ok(HttpResponse::Ok().json(SuccessResponse::new(status))),
         Err(err) => {
             match err {

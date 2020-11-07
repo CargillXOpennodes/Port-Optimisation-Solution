@@ -20,7 +20,7 @@ use std::{error::Error, fmt, time::{SystemTime, Duration, UNIX_EPOCH}};
 use diesel::connection::Connection;
 use gameroom_database::{
     error, helpers,
-    models::{Status, StatusType},
+    models::Status,
     ConnectionPool,
 };
 use scabbard::service::{StateChange, StateChangeEvent};
@@ -145,10 +145,10 @@ impl StatusStateDeltaProcessor {
                                 updated_time: time,
                                 ..status
                             };
-                            let epoch = time.checked_sub(time.duration_since(UNIX_EPOCH).into_ok());
-                            m.is_bunkering = match status_state[12].to_string() {
-                                String::from("true") => Some(true),
-                                String::from("false") => Some(false),
+                            let epoch = time.checked_sub(time.duration_since(UNIX_EPOCH).unwrap_or(Duration::from_nanos(0)));
+                            m.is_bunkering = match status_state[12].as_str() {
+                                "true" => Some(true),
+                                "false" => Some(false),
                                 _ => None
                             };
                             if let Some(epoch_time) = epoch {
@@ -186,7 +186,7 @@ impl StatusStateDeltaProcessor {
                                 }
                             }
                             notification = helpers::create_new_notification(
-                                &format!("new_message_created:{}", message_state[0]),
+                                &format!("new_status_created:{}", status_state[0]),
                                 &self.requester,
                                 &self.node_id,
                                 &self.circuit_id,
@@ -216,10 +216,10 @@ impl StatusStateDeltaProcessor {
                                 created_time: time,
                                 updated_time: time
                             };
-                            let epoch = time.checked_sub(time.duration_since(UNIX_EPOCH).into_ok());
-                            m.is_bunkering = match status_state[12].to_string() {
-                                String::from("true") => Some(true),
-                                String::from("false") => Some(false),
+                            let epoch = time.checked_sub(time.duration_since(UNIX_EPOCH).unwrap_or(Duration::from_nanos(0)));
+                            m.is_bunkering = match status_state[12].as_str() {
+                                "true" => Some(true),
+                                "false" => Some(false),
                                 _ => None
                             };
                             if let Some(epoch_time) = epoch {
@@ -258,7 +258,7 @@ impl StatusStateDeltaProcessor {
                             }
 
                             notification = helpers::create_new_notification(
-                                &format!("message_updated:{}", message_state[0]),
+                                &format!("status_updated:{}", status_state[0]),
                                 &self.requester,
                                 &self.node_id,
                                 &self.circuit_id,
