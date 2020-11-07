@@ -16,7 +16,7 @@
  */
 
 use super::schema::*;
-use std::time::{SystemTime, Duration};
+use std::time::SystemTime;
 
 #[derive(Insertable, Queryable, Identifiable, PartialEq, Debug)]
 #[table_name = "gameroom"]
@@ -165,7 +165,6 @@ pub struct NewGameroomNotification {
 // #[table_name = "messages"]
 // pub struct Message {
 //     pub id: i32,
-//     pub circuit_id: String,
 //     pub message_name: String,
 //     pub message_content: String,
 //     pub message_type: String,
@@ -173,30 +172,32 @@ pub struct NewGameroomNotification {
 //     pub sender: String,
 //     pub participant_1: String,
 //     pub participant_2: String,
+//     pub participant_2: String,
 //     pub created_time: SystemTime,
 //     pub updated_time: SystemTime,
 // }
 
-
 #[derive(Clone, Queryable, Identifiable, Associations, Insertable, AsChangeset)]
 #[table_name = "statuses"]
 pub struct Status {
-    id: i32,
-    status_name: String,
-    sender: String,
-    participant1: String,
-    participant2: String,
-    docking_type: DockingType,
-    eta: Option<Duration>,
-    etb: Option<Duration>,
-    ata: Option<Duration>,
-    eto: Option<Duration>,
-    ato: Option<Duration>,
-    etc: Option<Duration>,
-    etd: Option<Duration>,
-    is_bunkering: Option<bool>,
-    bunkering_time: Option<Duration>,
-    logs: String,
+    pub id: i64,
+    pub status_name: String,
+    pub circuit_id: String,
+    pub sender: String,
+    pub participant_1: String,
+    pub participant_2: String,
+    pub eta: Option<SystemTime>,
+    pub etb: Option<SystemTime>,
+    pub ata: Option<SystemTime>,
+    pub eto: Option<SystemTime>,
+    pub ato: Option<SystemTime>,
+    pub etc: Option<SystemTime>,
+    pub etd: Option<SystemTime>,
+    pub is_bunkering: Option<bool>,
+    pub bunkering_time: Option<SystemTime>,
+    pub logs: String,
+    pub created_time: SystemTime,
+    pub updated_time: SystemTime,
 }
 
 #[derive(Queryable, PartialEq, Debug)]
@@ -225,19 +226,3 @@ pub struct ActiveGameroom {
 //     }
 // }
 
-#[derive(Debug, Copy, Clone)]
-enum DockingType {
-    LOADING,
-    DISCHARGE,
-    ERROR
-}
-
-impl ToString for DockingType {
-    fn to_string(&self) -> String {
-        return match self {
-            DockingType::LOADING => "LOADING".to_string(),
-            DockingType::DISCHARGE => "DISCHARGE".to_string(),
-            _ => "error".to_string()
-        }
-    }
-}

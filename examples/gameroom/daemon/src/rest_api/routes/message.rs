@@ -15,8 +15,8 @@
 use std::collections::HashMap;
 use std::time::{Duration, SystemTime};
 
-use actix_web::{web, Error, HttpResponse};
-use gameroom_database::{helpers, models::Message, ConnectionPool};
+use actix_web::{error, web, Error, HttpResponse};
+use gameroom_database::{helpers, models::XoGame, ConnectionPool};
 
 use crate::rest_api::RestApiResponseError;
 
@@ -26,38 +26,32 @@ use super::{
 };
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ApiMessage {
-    id : i32,
+pub struct ApiXoGame {
     circuit_id: String,
-    message_name: String,
-    message_content: String,
-    message_type: String,
-    sender: String,
-    previous_id: Option<i32>,
-    participant_1: String,
-    participant_2: String,
+    game_name: String,
+    player_1: String,
+    player_2: String,
+    game_status: String,
+    game_board: String,
     created_time: u64,
     updated_time: u64,
 }
 
-impl From<Message> for ApiMessage {
-    fn from(msg: Message) -> Self {
+impl From<XoGame> for ApiXoGame {
+    fn from(game: XoGame) -> Self {
         Self {
-            id: msg.id,
-            circuit_id: msg.circuit_id.to_string(),
-            message_name: msg.message_name.to_string(),
-            message_content: msg.message_content.to_string(),
-            message_type: msg.message_type.to_string(),
-            sender: msg.sender.to_string(),
-            previous_id: msg.previous_id,
-            participant_1: msg.participant_1.to_string(),
-            participant_2: msg.participant_2.to_string(),
-            created_time: msg
+            circuit_id: game.circuit_id.to_string(),
+            game_name: game.game_name.to_string(),
+            player_1: game.player_1.to_string(),
+            player_2: game.player_2.to_string(),
+            game_status: game.game_status.to_string(),
+            game_board: game.game_board.to_string(),
+            created_time: game
                 .created_time
                 .duration_since(SystemTime::UNIX_EPOCH)
                 .unwrap_or_else(|_| Duration::new(0, 0))
                 .as_secs(),
-            updated_time: msg
+            updated_time: game
                 .updated_time
                 .duration_since(SystemTime::UNIX_EPOCH)
                 .unwrap_or_else(|_| Duration::new(0, 0))
@@ -66,7 +60,46 @@ impl From<Message> for ApiMessage {
     }
 }
 
-pub async fn list_messages(
+pub async fn fetch_xo(
+    pool: web::Data<ConnectionPool>,
+    circuit_id: web::Path<String>,
+    game_name: web::Path<String>,
+) -> Result<HttpResponse, Error> {
+    match web::block(move || fetch_xo_game_from_db(pool, &circuit_id, &game_name)).await {
+        Ok(xo_game) => Ok(HttpResponse::Ok().json(SuccessResponse::new(xo_game))),
+        Err(err) => {
+            match err {
+                error::BlockingError::Error(err) => match err {
+                    RestApiResponseError::NotFound(err) => {
+                        Ok(HttpResponse::NotFound().json(ErrorResponse::not_found(&err)))
+                    }
+                    _ => Ok(HttpResponse::BadRequest()
+                        .json(ErrorResponse::bad_request(&err.to_string()))),
+                },
+                error::BlockingError::Canceled => {
+                    debug!("Internal Server Error: {}", err);
+                    Ok(HttpResponse::InternalServerError().json(ErrorResponse::internal_error()))
+                }
+            }
+        }
+    }
+}
+
+fn fetch_xo_game_from_db(
+    pool: web::Data<ConnectionPool>,
+    circuit_id: &str,
+    game_name: &str,
+) -> Result<ApiXoGame, RestApiResponseError> {
+    if let Some(xo_game) = helpers::fetch_xo_game(&*pool.get()?, circuit_id, game_name)? {
+        return Ok(ApiXoGame::from(xo_game));
+    }
+    Err(RestApiResponseError::NotFound(format!(
+        "XO Game with name {} not found",
+        game_name
+    )))
+}
+
+pub async fn list_xo(
     pool: web::Data<ConnectionPool>,
     circuit_id: web::Path<String>,
     query: web::Query<HashMap<String, usize>>,
@@ -80,9 +113,9 @@ pub async fn list_messages(
         .get("limit")
         .map(ToOwned::to_owned)
         .unwrap_or_else(|| DEFAULT_LIMIT);
-    let base_link = format!("api/message/{}/messages?", &circuit_id);
+    let base_link = format!("api/xo/{}/games?", &circuit_id);
 
-    match web::block(move || list_messages_from_db(pool, &circuit_id.clone(), limit, offset)).await
+    match web::block(move || list_xo_games_from_db(pool, &circuit_id.clone(), limit, offset)).await
     {
         Ok((games, query_count)) => {
             let paging_info =
@@ -96,20 +129,20 @@ pub async fn list_messages(
     }
 }
 
-fn list_messages_from_db(
+fn list_xo_games_from_db(
     pool: web::Data<ConnectionPool>,
     circuit_id: &str,
     limit: usize,
     offset: usize,
-) -> Result<(Vec<ApiMessage>, i64), RestApiResponseError> {
+) -> Result<(Vec<ApiXoGame>, i64), RestApiResponseError> {
     let db_limit = validate_limit(limit);
     let db_offset = offset as i64;
 
-    let messages = helpers::list_messages(&*pool.get()?, circuit_id, db_limit, db_offset)?
+    let xo_games = helpers::list_xo_games(&*pool.get()?, circuit_id, db_limit, db_offset)?
         .into_iter()
-        .map(ApiMessage::from)
+        .map(ApiXoGame::from)
         .collect();
-    let message_count = helpers::get_message_count(&*pool.get()?)?;
+    let game_count = helpers::get_xo_game_count(&*pool.get()?)?;
 
-    Ok((messages, message_count))
+    Ok((xo_games, game_count))
 }
