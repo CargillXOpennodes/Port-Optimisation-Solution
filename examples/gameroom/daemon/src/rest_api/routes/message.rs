@@ -15,8 +15,8 @@
 use std::collections::HashMap;
 use std::time::{Duration, SystemTime};
 
-use actix_web::{error, web, Error, HttpResponse};
-use gameroom_database::{helpers, models::XoGame, ConnectionPool};
+use actix_web::{web, Error, HttpResponse};
+use gameroom_database::{helpers, models::Status, ConnectionPool};
 
 use crate::rest_api::RestApiResponseError;
 
@@ -25,97 +25,104 @@ use super::{
     DEFAULT_OFFSET,
 };
 
+
+// pub struct ApiMessage {
+//     id : i32,
+//     circuit_id: String,
+//     message_name: String,
+//     message_content: String,
+//     message_type: String,
+//     sender: String,
+//     previous_id: Option<i32>,
+//     participant_1: String,
+//     participant_2: String,
+//     created_time: u64,
+//     updated_time: u64,
+// }
+
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ApiXoGame {
-    circuit_id: String,
-    game_name: String,
-    player_1: String,
-    player_2: String,
-    game_status: String,
-    game_board: String,
-    created_time: u64,
-    updated_time: u64,
+pub struct ApiStatus {
+    name: String,
+    sender: String,
+    participant1: String,
+    participant2: String,
+    participant1_short: String,
+    participant2_short: String,
+    docking_type: DockingType,
+    eta: Option<Duration>,
+    etb: Option<Duration>,
+    ata: Option<Duration>,
+    eto: Option<Duration>,
+    ato: Option<Duration>,
+    etc: Option<Duration>,
+    etd: Option<Duration>,
+    is_bunkering: Option<bool>,
+    bunkering_time: Option<Duration>,
+    logs: String,
 }
 
-impl From<XoGame> for ApiXoGame {
-    fn from(game: XoGame) -> Self {
-        Self {
-            circuit_id: game.circuit_id.to_string(),
-            game_name: game.game_name.to_string(),
-            player_1: game.player_1.to_string(),
-            player_2: game.player_2.to_string(),
-            game_status: game.game_status.to_string(),
-            game_board: game.game_board.to_string(),
-            created_time: game
-                .created_time
-                .duration_since(SystemTime::UNIX_EPOCH)
-                .unwrap_or_else(|_| Duration::new(0, 0))
-                .as_secs(),
-            updated_time: game
-                .updated_time
-                .duration_since(SystemTime::UNIX_EPOCH)
-                .unwrap_or_else(|_| Duration::new(0, 0))
-                .as_secs(),
+// impl From<Message> for ApiMessage {
+//     fn from(sta: Message) -> Self {
+//         Self {
+//             id: sta.id,
+//             circuit_id: sta.circuit_id.to_string(),
+//             message_name: sta.message_name.to_string(),
+//             message_content: sta.message_content.to_string(),
+//             message_type: sta.message_type.to_string(),
+//             sender: sta.sender.to_string(),
+//             previous_id: sta.previous_id,
+//             participant_1: sta.participant_1.to_string(),
+//             participant_2: sta.participant_2.to_string(),
+//             created_time: sta
+//                 .created_time
+//                 .duration_since(SystemTime::UNIX_EPOCH)
+//                 .unwrap_or_else(|_| Duration::new(0, 0))
+//                 .as_secs(),
+//             updated_time: sta
+//                 .updated_time
+//                 .duration_since(SystemTime::UNIX_EPOCH)
+//                 .unwrap_or_else(|_| Duration::new(0, 0))
+//                 .as_secs(),
+//         }
+//     }
+// }
+
+impl From<Status> for ApiStatus {
+    fn from(sta: Status) -> Status {
+        Status {
+            name: name,
+            sender: sta.sender,
+            participant1: sta.participant1
+            participant2: sta.partcipant2
+            participant1_short: sta.participant1_short
+            participant2_short: sta.participant2_short
+            docking_type: sta.docking_type.DockingType(),
+            eta: sta.eta,
+            etb: sta.etb,
+            ata: sta.ata,
+            eto: sta.eto,
+            ato: sta.ato,
+            etc: sta.etc,
+            etd: sta.etd
+            is_bunkering: sta.is_bunkering
+            bunkering_time: sta.bunkering_time
+            logs: sta.logs
+
         }
     }
 }
 
-pub async fn fetch_xo(
-    pool: web::Data<ConnectionPool>,
-    circuit_id: web::Path<String>,
-    game_name: web::Path<String>,
-) -> Result<HttpResponse, Error> {
-    match web::block(move || fetch_xo_game_from_db(pool, &circuit_id, &game_name)).await {
-        Ok(xo_game) => Ok(HttpResponse::Ok().json(SuccessResponse::new(xo_game))),
-        Err(err) => {
-            match err {
-                error::BlockingError::Error(err) => match err {
-                    RestApiResponseError::NotFound(err) => {
-                        Ok(HttpResponse::NotFound().json(ErrorResponse::not_found(&err)))
-                    }
-                    _ => Ok(HttpResponse::BadRequest()
-                        .json(ErrorResponse::bad_request(&err.to_string()))),
-                },
-                error::BlockingError::Canceled => {
-                    debug!("Internal Server Error: {}", err);
-                    Ok(HttpResponse::InternalServerError().json(ErrorResponse::internal_error()))
-                }
-            }
-        }
+pub async fn list_statuses(
+    statuses: HashMap<String, Status>
+) -> String {
+    let mut status_strings: Vec<String> = vec![];
+    for (_, status) in statuses {
+        status_strings.push(status.to_string().clone());
     }
-}
+    status_strings.sort();
+    status_strings.join("|")
 
-fn fetch_xo_game_from_db(
-    pool: web::Data<ConnectionPool>,
-    circuit_id: &str,
-    game_name: &str,
-) -> Result<ApiXoGame, RestApiResponseError> {
-    if let Some(xo_game) = helpers::fetch_xo_game(&*pool.get()?, circuit_id, game_name)? {
-        return Ok(ApiXoGame::from(xo_game));
-    }
-    Err(RestApiResponseError::NotFound(format!(
-        "XO Game with name {} not found",
-        game_name
-    )))
-}
-
-pub async fn list_xo(
-    pool: web::Data<ConnectionPool>,
-    circuit_id: web::Path<String>,
-    query: web::Query<HashMap<String, usize>>,
-) -> Result<HttpResponse, Error> {
-    let offset: usize = query
-        .get("offset")
-        .map(ToOwned::to_owned)
-        .unwrap_or_else(|| DEFAULT_OFFSET);
-
-    let limit: usize = query
-        .get("limit")
-        .map(ToOwned::to_owned)
-        .unwrap_or_else(|| DEFAULT_LIMIT);
-    let base_link = format!("api/xo/{}/games?", &circuit_id);
-
-    match web::block(move || list_xo_games_from_db(pool, &circuit_id.clone(), limit, offset)).await
+    match web::block(move || list_statuses_from_db(pool, &circuit_id.clone(), limit, offset)).await
     {
         Ok((games, query_count)) => {
             let paging_info =
@@ -129,20 +136,20 @@ pub async fn list_xo(
     }
 }
 
-fn list_xo_games_from_db(
-    pool: web::Data<ConnectionPool>,
-    circuit_id: &str,
+
+
+fn list_statuses_from_db(
+    statuses: HashMap<String, Status>
     limit: usize,
     offset: usize,
-) -> Result<(Vec<ApiXoGame>, i64), RestApiResponseError> {
+) -> Result<(Vec<ApiStatus>, i64), RestApiResponseError> {
     let db_limit = validate_limit(limit);
     let db_offset = offset as i64;
 
-    let xo_games = helpers::list_xo_games(&*pool.get()?, circuit_id, db_limit, db_offset)?
+    let statuses = helpers::list_statuses(&*statuses.get()?, circuit_id, db_limit, db_offset)?
         .into_iter()
-        .map(ApiXoGame::from)
+        .map(ApiStatus::from)
         .collect();
-    let game_count = helpers::get_xo_game_count(&*pool.get()?)?;
 
-    Ok((xo_games, game_count))
+    Ok((statuses))
 }
