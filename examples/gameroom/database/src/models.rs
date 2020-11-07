@@ -161,20 +161,42 @@ pub struct NewGameroomNotification {
     pub read: bool,
 }
 
-#[derive(Clone, Queryable, Identifiable, Associations, Insertable, AsChangeset)]
-#[table_name = "messages"]
-pub struct Message {
-    pub id: i32,
-    pub circuit_id: String,
-    pub message_name: String,
-    pub message_content: String,
-    pub message_type: String,
-    pub previous_id: Option<i32>,
-    pub sender: String,
-    pub participant_1: String,
-    pub participant_2: String,
-    pub created_time: SystemTime,
-    pub updated_time: SystemTime,
+// #[derive(Clone, Queryable, Identifiable, Associations, Insertable, AsChangeset)]
+// #[table_name = "messages"]
+// pub struct Message {
+//     pub id: i32,
+//     pub circuit_id: String,
+//     pub message_name: String,
+//     pub message_content: String,
+//     pub message_type: String,
+//     pub previous_id: Option<i32>,
+//     pub sender: String,
+//     pub participant_1: String,
+//     pub participant_2: String,
+//     pub created_time: SystemTime,
+//     pub updated_time: SystemTime,
+// }
+
+
+#[derive(Debug, Clone, Default)]
+pub struct Status {
+    name: String,
+    sender: String,
+    participant1: String,
+    participant2: String,
+    participant1_short: String,
+    participant2_short: String,
+    docking_type: DockingType,
+    eta: Option<Duration>,
+    etb: Option<Duration>,
+    ata: Option<Duration>,
+    eto: Option<Duration>,
+    ato: Option<Duration>,
+    etc: Option<Duration>,
+    etd: Option<Duration>,
+    is_bunkering: Option<bool>,
+    bunkering_time: Option<Duration>,
+    logs: String,
 }
 
 #[derive(Queryable, PartialEq, Debug)]
@@ -188,16 +210,33 @@ pub struct ActiveGameroom {
 }
 
 // for message type handling
+// #[derive(Debug, Copy, Clone)]
+// pub enum MessageType {
+//     TEXT,
+//     ERROR
+// }
+
+// impl ToString for MessageType {
+//     fn to_string(&self) -> String {
+//         return match self {
+//             MessageType::TEXT => "TEXT".to_string(),
+//             _ => "error".to_string()
+//         }
+//     }
+// }
+
 #[derive(Debug, Copy, Clone)]
-pub enum MessageType {
-    TEXT,
+enum DockingType {
+    LOADING,
+    DISCHARGE,
     ERROR
 }
 
-impl ToString for MessageType {
+impl ToString for DockingType {
     fn to_string(&self) -> String {
         return match self {
-            MessageType::TEXT => "TEXT".to_string(),
+            DockingType::LOADING => "LOADING".to_string(),
+            DockingType::DISCHARGE => "DISCHARGE".to_string(),
             _ => "error".to_string()
         }
     }
