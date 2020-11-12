@@ -47,14 +47,15 @@ CREATE TABLE IF NOT EXISTS gameroom_proposal (
 );
 
 
-CREATE TABLE IF NOT EXISTS proposal_vote_record(
-  id                        BIGSERIAL   PRIMARY KEY,
-  proposal_id               BIGSERIAL   NOT NULL,
-  voter_public_key          TEXT        NOT NULL,
-  voter_node_id             TEXT        NOT NULL,
-  vote                      TEXT        NOT NULL,
-  created_time              TIMESTAMP   NOT NULL,
-  FOREIGN KEY (proposal_id) REFERENCES gameroom_proposal(id) ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS proposal_vote_record
+(
+    id               BIGSERIAL PRIMARY KEY,
+    proposal_id      BIGSERIAL NOT NULL,
+    voter_public_key TEXT      NOT NULL,
+    voter_node_id    TEXT      NOT NULL,
+    vote             TEXT      NOT NULL,
+    created_time     TIMESTAMP NOT NULL,
+    FOREIGN KEY (proposal_id) REFERENCES gameroom_proposal(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS gameroom_member (

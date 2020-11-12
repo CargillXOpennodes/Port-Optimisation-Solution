@@ -166,6 +166,10 @@ pub fn run(
                                 .service(web::resource("").route(web::get().to(routes::list_statuses)),
                         ),
                     )
+                            .service(web::resource("/datasendinglayer").route(web::get().to(routes::data_sharing_layer))
+
+                            ),
+
                 )
             })
             .bind(bind_url)?

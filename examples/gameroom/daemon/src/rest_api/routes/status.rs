@@ -171,6 +171,7 @@ pub async fn list_statuses(
     pool: web::Data<ConnectionPool>,
     circuit_id: web::Path<String>,
     query: web::Query<HashMap<String, usize>>,
+
 ) -> Result<HttpResponse, Error> {
     let offset: usize = query
         .get("offset")
