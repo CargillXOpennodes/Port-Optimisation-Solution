@@ -20,6 +20,7 @@ mod notification;
 mod proposal;
 mod submit;
 mod status;
+mod datasendinglayer;
 
 pub use authenticate::*;
 pub use gameroom::*;
@@ -29,6 +30,7 @@ pub use notification::*;
 pub use proposal::*;
 pub use submit::*;
 pub use status::*;
+pub use datasendinglayer::*;
 
 use percent_encoding::{AsciiSet, CONTROLS};
 use serde::{Deserialize, Serialize};

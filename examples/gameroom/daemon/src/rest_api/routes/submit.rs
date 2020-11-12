@@ -29,7 +29,7 @@ use super::{ErrorResponse, SuccessResponse};
 use crate::config::NodeInfo;
 use crate::rest_api::RestApiResponseError;
 
-const DEFAULT_WAIT: u64 = 30; // default wait time in seconds for batch to be commited
+pub(crate) const DEFAULT_WAIT: u64 = 30; // default wait time in seconds for batch to be commited
 
 pub async fn submit_signed_payload(
     client: web::Data<Client>,
@@ -211,7 +211,7 @@ pub async fn submit_scabbard_payload(
     }
 }
 
-fn fetch_service_id_for_gameroom_service_from_db(
+pub(crate) fn fetch_service_id_for_gameroom_service_from_db(
     pool: web::Data<ConnectionPool>,
     circuit_id: &str,
     node_id: &str,
@@ -226,7 +226,7 @@ fn fetch_service_id_for_gameroom_service_from_db(
     )
 }
 
-fn parse_link(response_bytes: &[u8]) -> Result<String, RestApiResponseError> {
+pub(crate) fn parse_link(response_bytes: &[u8]) -> Result<String, RestApiResponseError> {
     let mut response_value: HashMap<String, String> = serde_json::from_slice(&response_bytes)
         .map_err(|err| {
             RestApiResponseError::InternalError(format!(
@@ -244,7 +244,7 @@ fn parse_link(response_bytes: &[u8]) -> Result<String, RestApiResponseError> {
     }
 }
 
-fn process_failed_baches(invalid_batches: &[&BatchInfo]) -> String {
+pub(crate) fn process_failed_baches(invalid_batches: &[&BatchInfo]) -> String {
     if invalid_batches.is_empty() {
         "".to_string()
     } else if invalid_batches.len() == 1 {
@@ -262,7 +262,7 @@ fn process_failed_baches(invalid_batches: &[&BatchInfo]) -> String {
     }
 }
 
-async fn check_batch_status(
+pub(crate) async fn check_batch_status(
     client: web::Data<Client>,
     splinterd_url: &str,
     link: &str,

@@ -203,7 +203,7 @@ pub async fn propose_gameroom(
     })))
 }
 
-async fn fetch_node_information(
+pub(crate) async fn fetch_node_information(
     node_ids: &[String],
     splinterd_url: &str,
     client: web::Data<Client>,

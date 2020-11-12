@@ -768,7 +768,7 @@ const payload_bytes =  [
   125
 ];
 
-submitPayload(signPayload(payload_bytes, alice.privateKey)).then((data) => console.log("fa"))
+//submitPayload(signPayload(payload_bytes, alice.privateKey)).then((data) => console.log("fa"))
 
 // fs.writeFile('../../../payload', createGame(alice, "name23"));//, "cGHwW-HydnS")
 
