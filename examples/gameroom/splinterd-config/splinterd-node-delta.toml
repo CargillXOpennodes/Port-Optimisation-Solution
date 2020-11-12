@@ -16,7 +16,7 @@
 # Config file format version
 version = "1"
 
-node_id = "delta"
+node_id = "delta-node-000"
 
 # Endpoints used for daemon to daemon communication.
 network_endpoingameroom_splinterd-db-delta_run_65911f24af36ts = ["tcps://127.0.0.1:8044"]

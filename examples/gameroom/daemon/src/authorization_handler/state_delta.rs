@@ -123,12 +123,13 @@ impl StatusStateDeltaProcessor {
                 conn.transaction::<_, error::DatabaseError, _>(|| {
                     let mut m;
                     let notification;
+                    debug!("{:?}", status_state);
                     match helpers::fetch_status(&conn, &self.circuit_id, &status_name)? {
                         Some(status) => {
                             m = Status {
                                 id: 0,
                                 status_name,
-                                circuit_id: "".to_string(),
+                                circuit_id: self.circuit_id.to_string().clone(),
                                 sender: status_state[1].to_string().clone(),
                                 participant_1: "".to_string(),
                                 participant_2: status_state[3].to_string().clone(),
@@ -145,7 +146,11 @@ impl StatusStateDeltaProcessor {
                                 updated_time: time,
                                 ..status
                             };
-                            let epoch = time.checked_sub(time.duration_since(UNIX_EPOCH).unwrap_or(Duration::from_nanos(0)));
+                            let epoch = time
+                                .checked_sub(time
+                                    .duration_since(UNIX_EPOCH)
+                                    .unwrap_or(Duration::from_nanos(0)));
+
                             m.is_bunkering = match status_state[12].as_str() {
                                 "true" => Some(true),
                                 "false" => Some(false),
@@ -199,7 +204,7 @@ impl StatusStateDeltaProcessor {
                             m = Status {
                                 id: 0,
                                 status_name,
-                                circuit_id: "".to_string(),
+                                circuit_id: self.circuit_id.to_string().clone(),
                                 sender: status_state[1].to_string().clone(),
                                 participant_1: "".to_string(),
                                 participant_2: status_state[3].to_string().clone(),
