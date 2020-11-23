@@ -161,18 +161,41 @@ pub struct NewGameroomNotification {
     pub read: bool,
 }
 
+// #[derive(Clone, Queryable, Identifiable, Associations, Insertable, AsChangeset)]
+// #[table_name = "messages"]
+// pub struct Message {
+//     pub id: i32,
+//     pub message_name: String,
+//     pub message_content: String,
+//     pub message_type: String,
+//     pub previous_id: Option<i32>,
+//     pub sender: String,
+//     pub participant_1: String,
+//     pub participant_2: String,
+//     pub participant_2: String,
+//     pub created_time: SystemTime,
+//     pub updated_time: SystemTime,
+// }
+
 #[derive(Clone, Queryable, Identifiable, Associations, Insertable, AsChangeset)]
-#[table_name = "messages"]
-pub struct Message {
-    pub id: i32,
+#[table_name = "statuses"]
+pub struct Status {
+    pub id: i64,
+    pub status_name: String,
     pub circuit_id: String,
-    pub message_name: String,
-    pub message_content: String,
-    pub message_type: String,
-    pub previous_id: Option<i32>,
     pub sender: String,
     pub participant_1: String,
     pub participant_2: String,
+    pub eta: Option<SystemTime>,
+    pub etb: Option<SystemTime>,
+    pub ata: Option<SystemTime>,
+    pub eto: Option<SystemTime>,
+    pub ato: Option<SystemTime>,
+    pub etc: Option<SystemTime>,
+    pub etd: Option<SystemTime>,
+    pub is_bunkering: Option<bool>,
+    pub bunkering_time: Option<SystemTime>,
+    pub logs: String,
     pub created_time: SystemTime,
     pub updated_time: SystemTime,
 }
@@ -186,3 +209,20 @@ pub struct ActiveGameroom {
     pub requester: String,
     pub requester_node_id: String,
 }
+
+// for message type handling
+// #[derive(Debug, Copy, Clone)]
+// pub enum MessageType {
+//     TEXT,
+//     ERROR
+// }
+
+// impl ToString for MessageType {
+//     fn to_string(&self) -> String {
+//         return match self {
+//             MessageType::TEXT => "TEXT".to_string(),
+//             _ => "error".to_string()
+//         }
+//     }
+// }
+

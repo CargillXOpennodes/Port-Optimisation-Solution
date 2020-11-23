@@ -95,16 +95,23 @@ table! {
 }
 
 table! {
-    messages (id) {
-        id -> Integer,
+    statuses (id) {
+        id -> Int8,
+        status_name -> Text,
         circuit_id -> Text,
-        message_name -> Text,
-        message_content -> Text,
-        message_type -> Text,
-        previous_id -> Nullable<Integer>,
         sender -> Text,
         participant_1 -> Text,
         participant_2 -> Text,
+        eta -> Nullable<Timestamp>,
+        etb -> Nullable<Timestamp>,
+        ata -> Nullable<Timestamp>,
+        eto -> Nullable<Timestamp>,
+        ato -> Nullable<Timestamp>,
+        etc -> Nullable<Timestamp>,
+        etd -> Nullable<Timestamp>,
+        is_bunkering -> Nullable<Bool>,
+        bunkering_time -> Nullable<Timestamp>,
+        logs -> Text,
         created_time -> Timestamp,
         updated_time -> Timestamp,
     }

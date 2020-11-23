@@ -44,8 +44,8 @@ pub struct CreateGameroomForm {
 }
 
 #[derive(Debug, Serialize)]
-struct ApiGameroom {
-    circuit_id: String,
+pub struct ApiGameroom {
+    pub circuit_id: String,
     authorization_type: String,
     persistence: String,
     routes: String,
@@ -203,7 +203,7 @@ pub async fn propose_gameroom(
     })))
 }
 
-async fn fetch_node_information(
+pub(crate) async fn fetch_node_information(
     node_ids: &[String],
     splinterd_url: &str,
     client: web::Data<Client>,
@@ -280,7 +280,7 @@ async fn fetch_node_information(
 
 /// Represents a node as presented by the Splinter REST API.
 #[derive(Clone, Deserialize, Serialize)]
-struct NodeResponse {
+pub struct NodeResponse {
     identity: String,
     endpoints: Vec<String>,
 }
@@ -357,7 +357,7 @@ pub async fn list_gamerooms(
     }
 }
 
-fn list_gamerooms_from_db(
+pub(crate) fn list_gamerooms_from_db(
     pool: web::Data<ConnectionPool>,
     status_optional: Option<String>,
     limit: usize,

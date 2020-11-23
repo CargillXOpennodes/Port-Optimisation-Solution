@@ -89,10 +89,15 @@ COPY --from=BUILDER /build/target/debian/gameroom*.deb /tmp/
 COPY --from=BUILDER /tmp/splinter-*.deb /tmp/
 COPY --from=BUILDER /commit-hash /commit-hash
 
-RUN apt-get update \
- && dpkg --unpack /tmp/gameroom*.deb \
- && dpkg --unpack /tmp/splinter*.deb \
- && apt-get -f -y install
+RUN apt-get update
+
+RUN dpkg --unpack /tmp/gameroom*.deb; exit 0
+RUN dpkg --unpack /tmp/splinter*.deb; exit 0
+
+RUN rm -rf /var/lib/dpkg/info/gameroom*.postinst
+RUN rm -rf /var/lib/dpkg/info/splinter*.postinst
+
+RUN apt-get -f -y install
 
 # Fetch the XO smart contract
 #RUN curl -OLsS https://build.sawtooth.me/job/Sawtooth-Hyperledger/job/sawtooth-sdk-rust/job/master/lastSuccessfulBuild/artifact/build/scar/*zip*/scar.zip

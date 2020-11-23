@@ -29,7 +29,7 @@ use super::{ErrorResponse, SuccessResponse};
 use crate::config::NodeInfo;
 use crate::rest_api::RestApiResponseError;
 
-const DEFAULT_WAIT: u64 = 30; // default wait time in seconds for batch to be commited
+pub(crate) const DEFAULT_WAIT: u64 = 30; // default wait time in seconds for batch to be commited
 
 pub async fn submit_signed_payload(
     client: web::Data<Client>,
@@ -81,11 +81,24 @@ pub async fn submit_scabbard_payload(
     signed_payload: web::Bytes,
     query: web::Query<HashMap<String, String>>,
 ) -> Result<HttpResponse, Error> {
+    submit_scabbard_payload_internal(client, splinterd_url, pool, circuit_id.clone(), node_info, signed_payload, query.clone())
+        .await
+}
+
+pub async fn submit_scabbard_payload_internal(
+    client: web::Data<Client>,
+    splinterd_url: web::Data<String>,
+    pool: web::Data<ConnectionPool>,
+    circuit_id: String,
+    node_info: web::Data<NodeInfo>,
+    signed_payload: web::Bytes,
+    query: HashMap<String, String>,
+) -> Result<HttpResponse, Error> {
     let circuit_id_clone = circuit_id.clone();
     let service_id = match web::block(move || {
         fetch_service_id_for_gameroom_service_from_db(pool, &circuit_id_clone, &node_info.identity)
     })
-    .await
+        .await
     {
         Ok(service_id) => service_id,
         Err(err) => match err {
@@ -161,10 +174,10 @@ pub async fn submit_scabbard_payload(
                 None => "Unknown cause",
             };
             debug!(
-                        "Internal Server Error. Gameroom service responded with an error {} with message {}",
-                        response.status(),
-                        message
-                    );
+                "Internal Server Error. Gameroom service responded with an error {} with message {}",
+                response.status(),
+                message
+            );
             return Ok(HttpResponse::InternalServerError().json(ErrorResponse::internal_error()));
         }
     };
@@ -211,7 +224,7 @@ pub async fn submit_scabbard_payload(
     }
 }
 
-fn fetch_service_id_for_gameroom_service_from_db(
+pub(crate) fn fetch_service_id_for_gameroom_service_from_db(
     pool: web::Data<ConnectionPool>,
     circuit_id: &str,
     node_id: &str,
@@ -226,7 +239,7 @@ fn fetch_service_id_for_gameroom_service_from_db(
     )
 }
 
-fn parse_link(response_bytes: &[u8]) -> Result<String, RestApiResponseError> {
+pub(crate) fn parse_link(response_bytes: &[u8]) -> Result<String, RestApiResponseError> {
     let mut response_value: HashMap<String, String> = serde_json::from_slice(&response_bytes)
         .map_err(|err| {
             RestApiResponseError::InternalError(format!(
@@ -244,7 +257,7 @@ fn parse_link(response_bytes: &[u8]) -> Result<String, RestApiResponseError> {
     }
 }
 
-fn process_failed_baches(invalid_batches: &[&BatchInfo]) -> String {
+pub(crate) fn process_failed_baches(invalid_batches: &[&BatchInfo]) -> String {
     if invalid_batches.is_empty() {
         "".to_string()
     } else if invalid_batches.len() == 1 {
@@ -262,7 +275,8 @@ fn process_failed_baches(invalid_batches: &[&BatchInfo]) -> String {
     }
 }
 
-async fn check_batch_status(
+
+pub(crate) async fn check_batch_status(
     client: web::Data<Client>,
     splinterd_url: &str,
     link: &str,

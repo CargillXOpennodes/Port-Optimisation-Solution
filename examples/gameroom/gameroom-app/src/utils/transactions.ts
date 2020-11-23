@@ -15,7 +15,7 @@
 import protos from '@/protobuf';
 import { User } from '@/store/models';
 import { signXOPayload } from '@/utils/crypto';
-import { XO_FAMILY_NAME, XO_FAMILY_VERSION, XO_FAMILY_PREFIX } from '@/utils/addressing';
+import { MESSAGE_NAME, MESSAGE_VERSION, MESSAGE_PREFIX } from '@/utils/addressing';
 import {
   calculateNamespaceRegistryAddress,
   computeContractAddress,
@@ -38,8 +38,8 @@ export function createTransaction(
   user: User,
 ) {
   const excuteTransactionAction = protos.ExecuteContractAction.create({
-    name: 'xo',
-    version: XO_FAMILY_VERSION,
+    name: 'sawtooth_message',
+    version: MESSAGE_VERSION,
     inputs,
     outputs,
     payload: payloadBytes,
@@ -51,8 +51,8 @@ export function createTransaction(
   }).finish();
 
   const transactionHeaderBytes = TransactionHeader.encode({
-    familyName: SABRE_FAMILY_NAME,
-    familyVersion: SABRE_FAMILY_VERSION,
+    familyName: MESSAGE_NAME,
+    familyVersion: MESSAGE_VERSION,
     inputs: prepare_inputs(inputs),
     outputs,
     signerPublicKey: user.publicKey,
@@ -95,9 +95,9 @@ export function createBatch(transactions: any, user: User) {
 
 function prepare_inputs(contractAddresses: string[]) {
   const returnAddresses = [
-    computeContractRegistryAddress(XO_FAMILY_NAME),
-    computeContractAddress(XO_FAMILY_NAME, XO_FAMILY_VERSION),
-    calculateNamespaceRegistryAddress(XO_FAMILY_PREFIX),
+    computeContractRegistryAddress(MESSAGE_NAME),
+    computeContractAddress(MESSAGE_NAME, MESSAGE_VERSION),
+    calculateNamespaceRegistryAddress(MESSAGE_PREFIX),
   ];
 
   return returnAddresses.concat(contractAddresses);

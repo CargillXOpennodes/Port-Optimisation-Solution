@@ -19,4 +19,4 @@ DROP TABLE proposal_vote_record;
 DROP TABLE gameroom_member;
 DROP TABLE gameroom_service;
 DROP TABLE gameroom_notification;
-DROP TABLE messages;
+DROP TABLE statuses;
