@@ -44,6 +44,9 @@ var bob = {
   "publicKey": "02d151f4389ba397cb87e0ca4bdba8012eeb0d457c3b6935830ce32e976a62d277",
   "privateKey": "dd8f92992971d26761b3bb8615c145c17050d4ed287e2b740d58388244c1d839"
 };
+var dan = {
+  "privateKey": "b7b87a06cce430ba412368f646e934e7992733ba7aeda0ab6e418d524203ad4b"
+};
 
 function http(method, url, data, headerFn, port) {
   return regeneratorRuntime.async(function http$(_context) {
@@ -52,7 +55,7 @@ function http(method, url, data, headerFn, port) {
         case 0:
           return _context.abrupt("return", new Promise(function (resolve, reject) {
             var request = new XMLHttpRequest();
-            request.open(method, "http://localhost:8001".concat(url));
+            request.open(method, "http://localhost:8002".concat(url));
 
             if (headerFn) {
               headerFn(request);
@@ -155,10 +158,12 @@ function submitPayload(payload, port) {
   });
 }
 
-var payload_bytes = [10, 84, 8, 1, 26, 64, 103, 246, 134, 39, 67, 20, 9, 145, 185, 226, 241, 69, 241, 30, 60, 144, 3, 83, 55, 170, 5, 95, 39, 34, 179, 39, 216, 174, 50, 217, 114, 139, 181, 58, 73, 245, 109, 68, 9, 219, 106, 39, 207, 174, 38, 240, 59, 211, 8, 238, 88, 187, 104, 95, 76, 74, 179, 149, 16, 69, 226, 0, 241, 54, 34, 14, 98, 117, 98, 98, 97, 45, 110, 111, 100, 101, 45, 48, 48, 48, 26, 81, 10, 11, 106, 72, 73, 108, 117, 45, 121, 69, 65, 76, 104, 18, 64, 51, 100, 54, 48, 54, 55, 54, 98, 102, 49, 48, 54, 55, 101, 98, 97, 55, 102, 48, 49, 101, 49, 50, 100, 48, 99, 57, 51, 55, 98, 53, 101, 50, 100, 55, 102, 48, 98, 55, 54, 49, 51, 50, 49, 51, 49, 49, 99, 56, 100, 55, 50, 57, 97, 56, 53, 98, 49, 100, 99, 97, 52, 53, 49, 24, 1];
-submitPayload((0, _crypto.signPayload)(payload_bytes, bob.privateKey)).then(function (data) {
-  return console.log("fa");
-}); // fs.writeFile('../../../payload', createGame(alice, "name23"));//, "cGHwW-HydnS")
+var payload_bytes = [10, 84, 8, 1, 26, 64, 77, 47, 181, 242, 190, 253, 174, 118, 237, 151, 190, 100, 38, 13, 142, 201, 79, 134, 52, 119, 162, 206, 145, 163, 213, 7, 133, 212, 213, 201, 255, 68, 81, 195, 101, 144, 75, 188, 196, 216, 168, 221, 170, 48, 89, 144, 116, 83, 221, 121, 109, 30, 175, 48, 47, 228, 167, 54, 45, 68, 184, 96, 211, 113, 34, 14, 100, 101, 108, 116, 97, 45, 110, 111, 100, 101, 45, 48, 48, 48, 26, 81, 10, 11, 120, 111, 48, 104, 99, 45, 69, 56, 86, 89, 55, 18, 64, 50, 50, 56, 102, 102, 100, 52, 97, 101, 101, 57, 97, 57, 54, 99, 97, 49, 101, 98, 99, 56, 51, 53, 57, 48, 53, 57, 102, 56, 100, 48, 52, 55, 53, 100, 55, 56, 48, 56, 51, 49, 97, 98, 53, 97, 100, 101, 53, 97, 49, 101, 49, 48, 53, 100, 49, 56, 98, 56, 54, 101, 48, 100, 98, 24, 1]; // submitPayload(signPayload(payload_bytes, alice.privateKey), 0).then((data) => console.log("Done"))
+// submitPayload(signPayload(payload_bytes, bob.privateKey), 0).then((data) => console.log("Done"))
+// submitPayload(signPayload(payload_bytes, dan.privateKey), 0).then((data) => console.log("Done"))
+
+var payload1 = Buffer.from((0, _crypto.signPayload)(payload_bytes, bob.privateKey)).toString('base64');
+console.log(payload1); // fs.writeFile('../../../payload', createGame(alice, "name23"));//, "cGHwW-HydnS")
 // console.log(Buffer.from(sdb).toString())
 // console.log(createGame(alice, "first"))
 // console.log(createGame(alice, "first").toString('binary'));

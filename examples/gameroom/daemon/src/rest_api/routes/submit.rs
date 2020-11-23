@@ -81,11 +81,24 @@ pub async fn submit_scabbard_payload(
     signed_payload: web::Bytes,
     query: web::Query<HashMap<String, String>>,
 ) -> Result<HttpResponse, Error> {
+    submit_scabbard_payload_internal(client, splinterd_url, pool, circuit_id.clone(), node_info, signed_payload, query.clone())
+        .await
+}
+
+pub async fn submit_scabbard_payload_internal(
+    client: web::Data<Client>,
+    splinterd_url: web::Data<String>,
+    pool: web::Data<ConnectionPool>,
+    circuit_id: String,
+    node_info: web::Data<NodeInfo>,
+    signed_payload: web::Bytes,
+    query: HashMap<String, String>,
+) -> Result<HttpResponse, Error> {
     let circuit_id_clone = circuit_id.clone();
     let service_id = match web::block(move || {
         fetch_service_id_for_gameroom_service_from_db(pool, &circuit_id_clone, &node_info.identity)
     })
-    .await
+        .await
     {
         Ok(service_id) => service_id,
         Err(err) => match err {
@@ -161,10 +174,10 @@ pub async fn submit_scabbard_payload(
                 None => "Unknown cause",
             };
             debug!(
-                        "Internal Server Error. Gameroom service responded with an error {} with message {}",
-                        response.status(),
-                        message
-                    );
+                "Internal Server Error. Gameroom service responded with an error {} with message {}",
+                response.status(),
+                message
+            );
             return Ok(HttpResponse::InternalServerError().json(ErrorResponse::internal_error()));
         }
     };
@@ -261,6 +274,7 @@ pub(crate) fn process_failed_baches(invalid_batches: &[&BatchInfo]) -> String {
         "Several transactions failed. Please try again. If it continues to fail please contact your administrator.".to_string()
     }
 }
+
 
 pub(crate) async fn check_batch_status(
     client: web::Data<Client>,
